@@ -24,8 +24,8 @@ function Init()
         --actor:SetSpriteEnabled( 0, true )
 		
 		
-		
-	   accel = .8
+		reflector = false
+		accel = .8
 	   
         --ground--
 		killed = false
@@ -579,6 +579,8 @@ function CancelAction()
 end
  
 function ChooseAction()
+
+
         if action == hitstun then
                 actionChanged = true
         end
@@ -702,16 +704,16 @@ function ChooseAction()
  
  
         if not actionChanged and not grounded then
-                if touchingRightWall and currentInput:Left() and not prevInput:Left() and not currentInput:Down() and ( action ~= gravitySlash or ( action == gravitySlash and frame > 18 ) ) then--and action ~= airDash then
+                if not reflector and  touchingRightWall and currentInput:Left() and not prevInput:Left() and not currentInput:Down() and ( action ~= gravitySlash or ( action == gravitySlash and frame > 18 ) ) then--and action ~= airDash then
                         SetAction( wallJump )
                         frame = 1
-                elseif touchingLeftWall and currentInput:Right() and not prevInput:Right() and not currentInput:Down() and ( action ~= gravitySlash or ( action == gravitySlash and frame > 18 ) ) then-- and action ~= airDash then
+                elseif not reflector and touchingLeftWall and currentInput:Right() and not prevInput:Right() and not currentInput:Down() and ( action ~= gravitySlash or ( action == gravitySlash and frame > 18 ) ) then-- and action ~= airDash then
                         SetAction( wallJump )
                         frame = 1
 				elseif action == wallCling and currentInput.A and not prevInput.A then
 						--SetAction( wallJump )
 						--frame = 1
-                elseif action ~= fastFall and action ~= gravitySlash and currentInput.A and not prevInput.A
+                elseif not reflector and action ~= fastFall and action ~= gravitySlash and currentInput.A and not prevInput.A
                         and (( actorRightWallJump and currentInput:Left() ) or ( actorLeftWallJump and currentInput:Right() )) then
                 --      and otherActor:Message( actor, "walljump", 0 ) ~= 0 and action == jump or action == doubleJump or action == wallJump then then
                         if actorRightWallJump and currentInput:Left() then
@@ -941,7 +943,8 @@ function ChooseAction()
        
        
        
-        if (grounded and touchingRightWall and actor:IsFacingRight()) or (grounded and touchingLeftWall and not actor:IsFacingRight()) then
+        if (not grounded and touchingRightWall and actor:IsFacingRight()) or ( not grounded and touchingLeftWall and not actor:IsFacingRight()) then
+				
                 --SetAction( stand )
                 --frame = 1
         end
@@ -1039,6 +1042,22 @@ function HandleAction()
                 end
         end
        
+		if reflector and ((not grounded and touchingRightWall and prevVelocity.x > 0) or ( not grounded and touchingLeftWall and prevVelocity.x < 0)) then
+			--actor:SetVelocity( -actor:GetVelocity().x, actor:GetVelocity().y )
+			
+			actor:SetVelocity( -prevVelocity.x, actor:GetVelocity().y )
+			
+			if actor:IsFacingRight() then
+			--	actor:FaceLeft()
+			else
+			--	actor:FaceRight()
+			end
+			
+                --SetAction( stand )
+                --frame = 1
+        end
+		reflector = false
+	   
         if action == gravitySlash then
                 if frame == 1 then
                         if actor:IsFacingRight() or currentInput:Right() then
@@ -2708,7 +2727,7 @@ function UpdatePostPhysics()
 	    end
 		print( "--------------------------------------" )
 		--this is super buggy still TT
-		if not currentInput:Down() and actor:GetVelocity().y >= -extraVel and (action == jump or action == doubleJump or ( action == wallJump and frame > 25 ) or ( action == gravitySlash and frame > 18 ) ) and ( touchingRightWall and currentInput:Right() or touchingLeftWall and currentInput:Left() ) and action ~= airDash and action ~= wallCling then
+		if not reflector and not currentInput:Down() and actor:GetVelocity().y >= -extraVel and (action == jump or action == doubleJump or ( action == wallJump and frame > 25 ) or ( action == gravitySlash and frame > 18 ) ) and ( touchingRightWall and currentInput:Right() or touchingLeftWall and currentInput:Left() ) and action ~= airDash and action ~= wallCling then
 		--if not lastGrounded and ( touchingRightWall and not currentInput:Left() or touchingLeftWall and not currentInput:Right() ) and action ~= wallJump and action ~= gravitySlash and action ~= airDash  then
 		
 			SetAction( wallCling )
@@ -2907,7 +2926,7 @@ function HandleActorCollision( otherActor, hurtboxTag, pointCount, point1, point
        
         if enabled and normal.x > wallThreshold and testY < actor:GetPosition().y + playerHeight - 0  then
                 touchingLeftWall = true
-                print( "left")
+          
                 if trueGrounded then
                         --actor:SetPosition( prevPosition.x, prevPosition.y )
                         --actor:SetPosition( 0, -actor:GetVelocity().y )
@@ -2948,7 +2967,7 @@ function HandleStageCollision( pointCount, point1, point2, normal, enabled )
 				
 		
                 if (action ~= jump and action ~= doubleJump) or frame > 1 and ( framesInAir > 16 or actor:GetVelocity().y >= 0 or not currentInput.A ) then
-					print( "this truegrounded")
+					
 					
 					trueGrounded = true
 					--actor:SetFriction( 1 )
@@ -3098,6 +3117,9 @@ function Message( sender, msg, tag )
                 elseif tag > 0 then
                         canInterruptJump = true
                 end
+		elseif msg == "reflector" then
+			reflector = true
+			
         end
        
        
