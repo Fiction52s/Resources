@@ -1047,10 +1047,10 @@ function HandleAction()
 			
 			actor:SetVelocity( -prevVelocity.x, actor:GetVelocity().y )
 			
-			if actor:IsFacingRight() then
-			--	actor:FaceLeft()
+			if touchingRightWall then
+				actor:FaceLeft()
 			else
-			--	actor:FaceRight()
+				actor:FaceRight()
 			end
 			
                 --SetAction( stand )
@@ -2727,7 +2727,7 @@ function UpdatePostPhysics()
 	    end
 		print( "--------------------------------------" )
 		--this is super buggy still TT
-		if not reflector and not currentInput:Down() and actor:GetVelocity().y >= -extraVel and (action == jump or action == doubleJump or ( action == wallJump and frame > 25 ) or ( action == gravitySlash and frame > 18 ) ) and ( touchingRightWall and currentInput:Right() or touchingLeftWall and currentInput:Left() ) and action ~= airDash and action ~= wallCling then
+		if not reflector and not currentInput:Down() and actor:GetVelocity().y >= -extraVel and (action == jump or action == doubleJump or ( action == wallJump and frame > 15--[[25--]] ) or ( action == gravitySlash and frame > 18 ) ) and ( touchingRightWall and currentInput:Right() or touchingLeftWall and currentInput:Left() ) and action ~= airDash and action ~= wallCling then
 		--if not lastGrounded and ( touchingRightWall and not currentInput:Left() or touchingLeftWall and not currentInput:Right() ) and action ~= wallJump and action ~= gravitySlash and action ~= airDash  then
 		
 			SetAction( wallCling )
