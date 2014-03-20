@@ -2706,8 +2706,8 @@ function UpdatePostPhysics()
                         if actor:IsReversed() then
                                 actor:SetPosition( actor:GetPosition().x, minGroundY + playerHeight + .02 )
                         else
-                              -- actor:SetPosition( actor:GetPosition().x, minGroundY - playerHeight - .02 )
-							
+                               actor:SetPosition( actor:GetPosition().x, minGroundY - playerHeight - .02 )
+							 
                         end
 						end
                 end
@@ -2779,7 +2779,7 @@ function HitActor( otherActor, hitboxTag )
                 --print( "testing blah" )
         end
         --5
-        return hitboxStrings[hitboxTag], 20, 3, 0, 0
+        return hitboxStrings[hitboxTag], 5, 3, 0, 0
         --return type, damage, hitlag, hitstun, centerX (relative to this actor)
 end
  
