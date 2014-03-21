@@ -11,7 +11,6 @@ end
 
 function Init()
 	--note: 1 is the first index in Lua, not 0
-	print( "start init" )
 	player = stage.player
 	health = 1
 	speed = .5--1
@@ -48,7 +47,34 @@ function Init()
 
 	frame = 1
 	
+	originalPos = ACTOR:b2Vec2()
+	originalPos.x = actor:GetPosition().x
+	originalPos.y = actor:GetPosition().y
 	
+	if framesToSwitch > 0 then
+		
+		dx = deltax
+		dy = deltay
+		len = math.sqrt( (dx * dx) + (dy * dy) )
+		accel = .01 * len
+		
+		dx = dx / len
+		dy = dy / len
+		
+		t = framesToSwitch / 2
+		
+		accelx = 2 * deltax * 30.00095 / (t * t)
+		accely = 2 * deltay * 30.00095 / (t * t)
+		
+		
+		print( "accelx: " .. accelx .. " ,,,,,,,,,,,,,,,,,,,,,")
+		print( "accely: " .. accely .. " ,,,,,,,,,,,,,,,,,,,,," )
+		
+		
+		
+	end
+	
+	frameCount = framesToSwitch / 2
 	--this will eventually be replaced with createBoxes ONLY IN UPDATE for each action, if the box changes during a dash or w.e.
 	--actor:ClearHurtboxes()
 	--actor:CreateCircle( 12, Layer_PlayerDetection, 0, 0, 30 )
@@ -77,7 +103,6 @@ function Init()
 	ceiling = false
 	exploding = false
 	
-	print( "end init" )
 end
 
 function GetAttackType( i )
@@ -122,7 +147,22 @@ function UpdatePrePhysics()
 		ActionEnded()
 		ChooseAction()
 		HandleAction()
-	
+		
+		if framesToSwitch > 0 then
+			if frameCount >= framesToSwitch then
+				--accel = -accel
+				accelx = -accelx
+				accely = -accely
+				frameCount = 0
+				
+			end
+			
+			print( "pos: " .. actor:GetPosition().x .. ", "  .. actor:GetPosition().y )
+			actor:SetVelocity( actor:GetVelocity().x + accelx, actor:GetVelocity().y + accely )
+			print( "vel: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+			frameCount = frameCount + 1
+		end
+		
 	end
 	
 	if slowFactor ~= 1 then
@@ -223,10 +263,23 @@ function Message( sender, msg, tag )
 	end
 	if msg == "slow" then
 		slowFactor = tag
+	elseif msg == "delta_x" then
+		deltax = tag
+		print( "deltax" )
+	elseif msg == "delta_y" then
+		deltay = tag
+	elseif msg == "frames_to_switch" then
+		framesToSwitch = tag
 	end
+	
 	return 0
 end
 
 function Die()
 	
 end
+
+--delta = ACTOR:b2Vec2()
+deltax = 0
+deltay = 0
+framesToSwitch = 0
