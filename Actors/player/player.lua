@@ -680,7 +680,7 @@ function ChooseAction()
 			end
 		end
        
-        if not actionChanged and currentInput.X and not prevInput.X and (action == jump or action == doubleJump or ( action == wallJump and frame > 4 ) ) then
+        if not actionChanged and currentInput.X and not prevInput.X and (action == jump or action == doubleJump or ( action == wallJump --[[and frame > 4--]] ) ) then
 				airControlLock = 10 - frame
 				if currentInput:Up() then
 					SetAction( upAirAttack )
