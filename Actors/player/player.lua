@@ -23,6 +23,10 @@ function Init()
         --groundThreshold = 5
         --actor:SetSpriteEnabled( 0, true )
 		
+		tetherPos = ACTOR:b2Vec2()
+		tetherPos.x = 0
+		tetherPos.y = 0
+		
 		
 		reflector = false
 		accel = .8
@@ -224,7 +228,13 @@ function Init()
 			jump[i] = { jumpSet, i - 1 }
         end
         jumpStrength = 30.5
-       
+        
+		tetherPull = {}
+		for i = 1, 2 do
+			tetherPull[i] = {doubleJumpSet, 2 }
+		end
+		tetherPullAccel = 2
+		
         landing = {}
         for i = 6, 7 do
 			landing[i] = { jumpSet, i - 1 }
@@ -557,6 +567,8 @@ function ActionEnded()
 						frame = 1
 				elseif action == slide then
 						frame = 5
+				elseif action == tetherPull then
+						frame = 1
                 else
                         SetAction( nil )
 						actionChanged = false
@@ -579,34 +591,84 @@ function CancelAction()
 end
  
 function ChooseAction()
-
+		
 
         if action == hitstun then
                 actionChanged = true
         end
-        if not actionChanged and currentInput.Y and not prevInput.Y then--and ( action == wallJump or action == stand or action == nil or action == run or action == jump or action == doubleJump ) then
+		
+		if action == tetherPull then
+			local dX = actor:GetPosition().x - tether:GetPosition().x
+			local dY = actor:GetPosition().y - tether:GetPosition().y
+			actionChanged = true
+			if math.abs( dX ) < .5 and math.abs( dY ) < .5 then
+				actor:SetPosition( tether:GetPosition().x, tether:GetPosition().y )
+				actor:SetVelocity( 0, 0 )
+				SetAction( jump )
+				frame = 3
+				hasDoubleJump = false
+				hasGravitySlash = false
+				hasAirDash = false
+				tether:Message( actor, "explode", 0 )
+				tetherOn = false
+				
+				actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, 0, .5, 1.5, 0 )
+			else
+				grounded = false
+			end
+		end
+			
+		
+        if action ~= tetherPull and not actionChanged and currentInput.Y and not prevInput.Y and 
+		(action == wallJump or action == wallCling or action == stand or action == dashToStand or action == dash or action == run 
+		or action == standToRun or (action == forwardAirAttack and frame > 7 ) or (action == downAirAttack and frame > 7 )
+		or (action == upAirAttack and frame > 7 ) or action == jump or action == doubleJump or action == airDashToFall 
+		or action == slide or action == fastFall) then--and ( action == wallJump or action == stand or action == nil or action == run or action == jump or action == doubleJump ) then
                 --timeWaveStoredVel.x = actor:GetVelocity().x
                 --timeWaveStoredVel.y = actor:GetVelocity().y
                 --timeWaveStoredAction = action
                 --timeWaveStoredFrame = frame
-                local vel = ACTOR:b2Vec2()
-                vel.x = 0
-                vel.y = 0
-                stage:CreateActor( "timewave", actor:GetPosition(), vel, actor:IsFacingRight(), false, 0, actor )
+				if tetherOn then
+					--tetherOn = false
+					--tether:Message( actor, "explode", 0 )
+					SetAction( tetherPull )
+					frame = 1
+					hasTether = false
+					grounded = false
+					actor:ClearPhysicsboxes()
+					
+					local difX = actor:GetPosition().x - tetherPos.x
+					local difY = actor:GetPosition().y - tetherPos.y
+					local len = math.sqrt( difX * difX + difY * difY )
+			
+					if len > 0 then
+						tetherax = difX / len
+						tetheray = difY / len
+						actor:SetVelocity( -tetherax * 10, -tetheray * 10 )
+						--actor:SetVelocity( 0, 0 )
+						prevVelocity.x = 0
+						prevVelocity.y = 0
+					else
+						actor:SetVelocity( 0, 0 )
+						prevVelocity.x = 0
+						prevVelocity.y = 0
+					end
+					
+					--player:SetPosition( tetherPos.x, tetherPos.y )
+				elseif hasTether then				
+					local vel = ACTOR:b2Vec2()
+					vel.x = 0
+					vel.y = 0
+					--stage:CreateActor( "timewave", actor:GetPosition(), vel, actor:IsFacingRight(), false, 0, actor )
+					tether = stage:CreateActor( "tether", actor:GetPosition(), vel, actor:IsFacingRight(), false, 0, actor )
+					tetherPos.x = actor:GetPosition().x
+					tetherPos.y = actor:GetPosition().y
+					tetherOn = true
+				end
                 --SetAction( timeWave )
                 --frame = 1
         end
-       
-        if shockwavePower > 0 then
-                --print( "shockwavepower: " .. shockwavePower )
-               
-                local aVel = ACTOR:b2Vec2()
-                aVel.x = 0
-                aVel.y = 0
-                --shockwaveActor = stage:CreateActor( "shockwave", actor:GetPosition(), aVel, actor:IsFacingRight(), false, shockwaveAngle, actor )
-                --shockwaveActor:Message( actor, "shockwavepower", shockwavePower )
-                shockwavePower = 0
-        end
+		
        
         if not actionChanged and currentInput.X and not prevInput.X and grounded then
 			if (action == stand or action == run or action == standToRun or action == nil or action == dashToStand or action == slide ) then
@@ -866,6 +928,7 @@ function ChooseAction()
                                 grounded = false
                                 hasGravitySlash = false
                                 hasAirDash = false
+								hasTether = false
                 end
         end
        
@@ -1014,7 +1077,26 @@ function HandleAction()
                       --  actor:CreateBox( 6, Layer_ActorDetection, 0, 1.125, 1, .75, 0 )
         end
        
-       
+        if action == tetherPull then
+			--[local difX = actor:GetPosition().x - tetherPos.x
+			--local difY = actor:GetPosition().y - tetherPos.y
+			--local len = math.sqrt( difX * difX + difY * difY )
+			
+			--if len > 0 then
+			--difX = difX / len
+			--difY = difY / len--]]
+			--actor:SetVelocity( actor:GetVelocity().x -difX * tetherPullAccel, actor:GetVelocity().y - difY * tetherPullAccel )
+			actor:SetVelocity( actor:GetVelocity().x -tetherax * tetherPullAccel, actor:GetVelocity().y - tetheray * tetherPullAccel )
+			--actor:SetVelocity( -difX * 30, -difY * 30 )
+			grounded = false
+			angle = 0
+			invincibilityFrames = 2
+			actor:CreateBox( bodyTypes.Normal, Layer_PlayerHitbox, 0, .1, 1, 1, 0 )
+			--end
+	    end
+		--tether:Message( actor, "explode", 0 )
+			
+	   
         if action == timeWave and frame == 1 then
                 --actor:CreateCircle( 12, Layer_ActorDetection, 0, 0, 4 )
                 --stage:CreateActor( "timewave", actor:GetPosition().x, actor:GetPosition().y, 0, 0, actor:IsFacingRight(), false, actor )
@@ -1080,6 +1162,7 @@ function HandleAction()
                 end
 				hasAirDash = false
                 hasGravitySlash = false
+				hasTether = false
                 grounded = false
                 angle = 0
 				
@@ -1503,7 +1586,7 @@ function HandleAction()
        
     
         --this allows for slight slowing during an air dash. We can decide later if we like it or not. ( currently removed )
-        if ( action ~= wallJump or ( action == wallJump and frame > 10 )) and not grounded and action ~= airDash and action ~= gravitySlash and action ~= hitstun then
+        if ( action ~= wallJump or ( action == wallJump and frame > 10 )) and not grounded and action ~= airDash and action ~= gravitySlash and action ~= hitstun and action ~= tetherPull then
 				if airControlLock > 0 then
 					airControlLock = airControlLock - 1
 				else
@@ -1535,7 +1618,7 @@ function HandleAction()
                 actor:ClearHurtboxes()
                 --actor:CreateBox( bodyTypes.Normal, Layer_PlayerHurtbox, 0, 0, .5, 1.5, actor:GetAngle() * 3 )
                 actor:CreateBox( bodyTypes.Normal, Layer_PlayerHurtbox, 0, 0, .5, 1.5, angle )
-                if prevAction == dash or prevAction == airDash or prevAction == dashAttack then
+                if action ~= tetherPull and ( prevAction == dash or prevAction == airDash or prevAction == dashAttack) then
                         actor:ClearPhysicsboxes()
 						--actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, 0, .5, .5, 0 )
                         actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, 0, .5, 1.5, 0 )
@@ -1591,7 +1674,7 @@ function HandleAction()
 				actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y * 3 / 4 )
         end
         --print( "before d: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
-        if grounded and action ~= dash and action ~= hitstun then
+        if grounded and action ~= dash and action ~= hitstun and action ~= tetherPull then
 				if action ~= slide then				
 					if currentInput:Left() then
 							if actor:GetVelocity().x > 0 then
@@ -1650,7 +1733,7 @@ function HandleAction()
         --jump action will eventually mean ascending only, not the fall
         --+why do i need gravity while standing?
         --if ( not grounded ) and action ~= airDash then--or action == stand then
-        if action ~= airDash then
+        if action ~= airDash and action ~= tetherPull then
         --if not grounded and action ~= airDash then
                 if ( action == stand or action == dashToStand ) and trueGrounded then	
 				--	actor:SetVelocity( actor:GetVelocity().x - groundNormal.x * grav, actor:GetVelocity().y - groundNormal.y *  grav )
@@ -2271,6 +2354,7 @@ function UpdatePrePhysics()
                 framesInAir = 0
                 hasDoubleJump = true
                 hasAirDash = true
+				hasTether = true
                 if gravityReverseCounter == 0 then
                         hasGravitySlash = true
                 end
@@ -2603,6 +2687,7 @@ function UpdatePrePhysics()
         --print( "frame: " .. frame )
 	   --print( "gnorm: " .. groundNormal.x .. ", " .. groundNormal.y )
       print( "vel1: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+	 -- print( "pos: " .. actor:GetPosition().x .. ", " .. actor:GetPosition().y )
         --print( "special: " .. specialVel.x .. ", " .. specialVel.y )
        
         prevPosition.x = actor:GetPosition().x
@@ -2901,6 +2986,7 @@ function HandleActorCollision( otherActor, hurtboxTag, pointCount, point1, point
 					
 					hasDoubleJump = true
 					hasAirDash = true
+					hasTether = true
 					if gravityReverseCounter == 0 then
 						hasGravitySlash = true
 					end
@@ -2951,7 +3037,7 @@ function HandleStageCollision( pointCount, point1, point2, normal, enabled )
                 shockwaveAngle = math.atan2( -normal.x, normal.y )
         end
  
-		print( "coll")
+		print( "coll" )
         if normal.y < -.5 and enabled then
 				
 				if not lastGrounded and currentInput:Down() and not ( currentInput:Right() or currentInput:Left() ) and normal.y > -1 then
@@ -2980,6 +3066,7 @@ function HandleStageCollision( pointCount, point1, point2, normal, enabled )
 					
 					hasDoubleJump = true
 					hasAirDash = true
+					hasTether = true
 					if gravityReverseCounter == 0 then
 						hasGravitySlash = true
 					end
@@ -3119,7 +3206,10 @@ function Message( sender, msg, tag )
                 end
 		elseif msg == "reflector" then
 			reflector = true
-			
+		elseif msg == "tether_destroyed" then
+			--damaged or meter damaged?
+			print( "tether destroyed!" )
+			tetherOn = false
         end
        
        
