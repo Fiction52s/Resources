@@ -18,7 +18,7 @@ function Init()
 	alive = false
 	die = false
 	
-	
+	pullMode = false
 	
 	slowCounter = 0
 	slowFactor = 1
@@ -183,11 +183,16 @@ end
 --for when you are hit by some Actor
 function HitByActor( otherActor, hitboxName, damage, hitlag, xhitstun, hurtboxTag, hitboxCenterX )
 	--print( "hit by actor with hitboxName " .. hitboxName )
-	health = health - damage
-	--print( "runner health: " .. health )
-	if health <= 0 then
-		player:Message( actor, "tether_destroyed", 0 )
-		actor:Kill()
+	
+	if not pullMode then
+		health = health - damage
+		--print( "runner health: " .. health )
+		if health <= 0 then
+			player:Message( actor, "tether_destroyed", 0 )
+			actor:Kill()
+		end
+	else
+		player:Message( actor, "tether_damage", damage )
 	end
 	
 	return true
@@ -238,6 +243,9 @@ function Message( sender, msg, tag )
 	
 	if msg == "explode" then
 		die = true
+	end
+	if msg == "tether_pull" then
+		pullMode = true
 	end
 	
 	return 0

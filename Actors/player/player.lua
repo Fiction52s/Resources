@@ -656,6 +656,7 @@ function ChooseAction()
 					
 					SetAction( tetherPull )
 					frame = 1
+					tether:Message( actor, "tether_pull", 0 )
 					hasTether = false
 					grounded = false
 					actor:ClearPhysicsboxes()
@@ -2796,6 +2797,11 @@ function UpdatePostPhysics()
 			--Spawn() 
 			killed = false
 			actor:Kill()
+			
+			if tetherOn then
+				tetherOn = false
+				tether:Message( actor, "explode", 0 )
+			end
 			print( "killed self" )
 			return
         end
@@ -2976,7 +2982,12 @@ function HitByActor( otherActor, hitboxName, damage, hitlag, xhitstun, hurtboxTa
         else
                 actor:FaceLeft()
         end
-               
+        
+		if tetherOn then
+			tether:Message( actor, "explode", 0 )
+			tetherOn = false
+		end
+		
         --if hitlag > 0 then
         --      -
         --end
@@ -3270,6 +3281,11 @@ function Message( sender, msg, tag )
 		elseif msg == "tether_arrived" then
 			tetherArrived = true
 			print( "arrived here" )
+		elseif msg == "tether_damage" then
+			actor.health = actor.health - tag
+			if actor.health <= 0 then
+				killed = true
+			end
         end
        
        
