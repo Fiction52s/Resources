@@ -2141,7 +2141,7 @@ end
 	carryVel.x = 0
 	carryVel.y = 0
 	player:SetCarryVelocity( 0, 0 )
-	
+	actor.health = maxHealth
 	--actor:SetPosition( originalPos.x, originalPos.y )
 	grounded = false
 	print( "spawn" )
@@ -2164,7 +2164,7 @@ function UpdatePrePhysics()
 						--actor:SetVelocity( 
 						--actor:SetVelocity( prevVelocity.x, prevVelocity.y )    
                         --actor:SetVelocity( actor:GetVelocity().x + specialVel.x, actor:GetVelocity().y + specialVel.y )
-                        --actor:SetSprite( 0, action[frame][1], action[frame][2] )
+                        actor:SetSprite( 0, action[frame][1], action[frame][2] )
 						--print( "early ending" )
                         return
                 end
@@ -2960,7 +2960,6 @@ function HitByActor( otherActor, hitboxName, damage, hitlag, xhitstun, hurtboxTa
         local hitSuccessful = false
         hitlagFrames = hitlag
         SetAction( hitstun )
-		
 		actor:SetSpriteOffset( 0, 0, 0 )
 		--actor:ClearHitboxes()
         frame = 1
