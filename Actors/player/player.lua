@@ -66,6 +66,7 @@ function Init()
 		hitlagVel = ACTOR:b2Vec2()
 		hitlagVel.x = 0
 		hitlagVel.y = 0
+		hitlagVelSet = false
 		
         oldGroundNormal = ACTOR:b2Vec2()
        
@@ -1118,7 +1119,7 @@ function HandleAction()
 				--difX = actor:GetVelocity().x / full
 				--difY = actor:GetVelocity().y / full
 				
-				local go = true
+				--[[local go = true
 				
 				
 				
@@ -1130,9 +1131,9 @@ function HandleAction()
 					go = false
 				elseif actor:GetVelocity().y < -maxTetherVel then
 					go = false
-				end
-				
-				if go then
+				end--]]
+				print( "vel before tether stuff: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+				if math.abs(-difX * (currentTetherVel + 10)) <= maxTetherVel and math.abs( -difY * (currentTetherVel + 10) ) <= maxTetherVel then
 					actor:SetVelocity( -difX * ( currentTetherVel + 10 ), -difY * ( currentTetherVel + 10 ) )
 					currentTetherVel = currentTetherVel + tetherPullAccel
 					--actor:SetVelocity( actor:GetVelocity().x * 1.1, actor:GetVelocity().y * 1.1 )
@@ -2157,6 +2158,7 @@ function UpdatePrePhysics()
                 hitlagFrames = hitlagFrames - 1
                 if hitlagFrames == 0 and action ~= hitstun then -- and aggressor
                         actor:SetVelocity( hitlagVel.x, hitlagVel.y )    
+						hitlagVelSet = false
                 else
 						--actor:SetVelocity( 0, 0 )
 						--actor:SetVelocity( 
@@ -2926,10 +2928,11 @@ end
 function ConfirmHit( otheractor, hitboxName, damage, hitlag, xx )
         hitlagFrames = hitlag
 		
-		if hitlagFrames > 0 then
+		if hitlagFrames > 0 and not hitlagVelSet then
 			hitlagVel.x = actor:GetVelocity().x
 			hitlagVel.y = actor:GetVelocity().y
 			actor:SetVelocity( 0, 0 )
+			hitlagVelSet = true
 		end
 end
  
