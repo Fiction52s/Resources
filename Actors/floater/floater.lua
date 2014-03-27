@@ -67,8 +67,8 @@ function Init()
 		accely = 2 * deltay * 30.00095 / (t * t)
 		
 		
-		print( "accelx: " .. accelx .. " ,,,,,,,,,,,,,,,,,,,,,")
-		print( "accely: " .. accely .. " ,,,,,,,,,,,,,,,,,,,,," )
+		--print( "accelx: " .. accelx .. " ,,,,,,,,,,,,,,,,,,,,,")
+		--print( "accely: " .. accely .. " ,,,,,,,,,,,,,,,,,,,,," )
 		
 		
 		
@@ -157,9 +157,9 @@ function UpdatePrePhysics()
 				
 			end
 			
-			print( "pos: " .. actor:GetPosition().x .. ", "  .. actor:GetPosition().y )
+		--	print( "pos: " .. actor:GetPosition().x .. ", "  .. actor:GetPosition().y )
 			actor:SetVelocity( actor:GetVelocity().x + accelx, actor:GetVelocity().y + accely )
-			print( "vel: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+		--	print( "vel: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
 			frameCount = frameCount + 1
 		end
 		

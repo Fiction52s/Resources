@@ -195,8 +195,9 @@ end
 
 --when you collide with some Actor
 function CollideWithActor( otherActor, tag )
-	if hurtboxTag == 12 then
-		print( "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" )
+	if tag == 12 then
+		player:Message( actor, "tether_arrived", 0 )
+		print( "TETHER _ ARRIVED" )
 	end
 	
 	return false, true

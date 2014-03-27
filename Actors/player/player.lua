@@ -13,6 +13,18 @@ function BodyType()
 end
  
 function Init()
+		
+		power_boosterUpgrade = false
+		power_gravitySwitch = false
+		power_timeSlow = false
+		power_berserkMode = false
+		power_spacialTether = false
+		
+		tetherArrived = false
+		power_boosterUpgrade = stage:HasPlayerPower( "boosterUpgrade" )
+		power_spacialTether = stage:HasPlayerPower( "spacialTether" )
+		power_gravitySwitch = stage:HasPlayerPower( "gravitySwitch" )
+	
         --note: 1 is the first index in Lua, not 0
         maxHealth = 500
         actor.health = maxHealth
@@ -26,6 +38,12 @@ function Init()
 		tetherPos = ACTOR:b2Vec2()
 		tetherPos.x = 0
 		tetherPos.y = 0
+		
+		maxTetherVel = 65
+		
+		currentTetherVel = 0
+		
+		
 		
 		
 		reflector = false
@@ -601,7 +619,7 @@ function ChooseAction()
 			local dX = actor:GetPosition().x - tether:GetPosition().x
 			local dY = actor:GetPosition().y - tether:GetPosition().y
 			actionChanged = true
-			if math.abs( dX ) < .5 and math.abs( dY ) < .5 then
+			if tetherArrived then
 				actor:SetPosition( tether:GetPosition().x, tether:GetPosition().y )
 				actor:SetVelocity( 0, 0 )
 				SetAction( jump )
@@ -612,11 +630,14 @@ function ChooseAction()
 				tether:Message( actor, "explode", 0 )
 				tetherOn = false
 				
+				
 				actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, 0, .5, 1.5, 0 )
 			else
 				grounded = false
 			end
 		end
+		
+		tetherArrived = false
 			
 		
         if action ~= tetherPull and not actionChanged and currentInput.Y and not prevInput.Y and 
@@ -631,24 +652,28 @@ function ChooseAction()
 				if tetherOn then
 					--tetherOn = false
 					--tether:Message( actor, "explode", 0 )
+					
 					SetAction( tetherPull )
 					frame = 1
 					hasTether = false
 					grounded = false
 					actor:ClearPhysicsboxes()
 					
+					currentTetherVel = 0
+					
 					local difX = actor:GetPosition().x - tetherPos.x
 					local difY = actor:GetPosition().y - tetherPos.y
 					local len = math.sqrt( difX * difX + difY * difY )
 			
 					if len > 0 then
-						tetherax = difX / len
-						tetheray = difY / len
-						actor:SetVelocity( -tetherax * 10, -tetheray * 10 )
+						difX = difX / len
+						difY = difY / len
+						actor:SetVelocity( -difX * 10, -difY * 10 )
 						--actor:SetVelocity( 0, 0 )
 						prevVelocity.x = 0
 						prevVelocity.y = 0
 					else
+						
 						actor:SetVelocity( 0, 0 )
 						prevVelocity.x = 0
 						prevVelocity.y = 0
@@ -902,7 +927,7 @@ function ChooseAction()
 		end
 		
 		--and not( currentInput:Left() or currentInput:Right() )
-        if not actionChanged then
+        if power_boosterUpgrade and not actionChanged then
                 if currentInput.B and not prevInput.B and currentInput:Down() and not grounded and ( action ~= forwardAirAttack or (action == forwardAirAttack and frame > 7 ))
 					and ( action ~= upAirAttack or (action == upAirAttack and frame > 7 )) and ( action ~= downAirAttack or (action == downAirAttack and frame > 7 )) and action ~= gravitySlash then--and not ( currentInput:Left() or currentInput:Right() )
                         if action ~= fastFall then
@@ -912,7 +937,7 @@ function ChooseAction()
                 end
         end
        
-        if not actionChanged then
+        if power_gravitySwitch and not actionChanged then
                 if currentInput.B and not prevInput.B and currentInput:Up() and ( action ~= forwardAirAttack or ( action == forwardAirAttack and frame > 7 ) )
 						and ( action ~= upAirAttack or ( action == upAirAttack and frame > 7 ) )
 						and ( action ~= downAirAttack or ( action == downAirAttack and frame > 7 ) )
@@ -966,7 +991,7 @@ function ChooseAction()
                                 --actor:SetVelocity( 0, 0 )
                                 --print( "ffff" )
                         end
-                elseif not grounded and hasAirDash and currentInput.B and not prevInput.B and ( action == jump or action == doubleJump
+                elseif power_boosterUpgrade and not grounded and hasAirDash and currentInput.B and not prevInput.B and ( action == jump or action == doubleJump
                            or action == wallJump or ( action == forwardAirAttack and frame > 7 )  
 						   or ( action == upAirAttack and frame > 7 )
 						   or ( action == downAirAttack and frame > 7 ) ) then
@@ -1078,21 +1103,50 @@ function HandleAction()
         end
        
         if action == tetherPull then
-			--[local difX = actor:GetPosition().x - tetherPos.x
-			--local difY = actor:GetPosition().y - tetherPos.y
-			--local len = math.sqrt( difX * difX + difY * difY )
+			 local difX = actor:GetPosition().x - tetherPos.x
+			 local difY = actor:GetPosition().y - tetherPos.y
+			 local len = math.sqrt( difX * difX + difY * difY )
 			
-			--if len > 0 then
-			--difX = difX / len
-			--difY = difY / len--]]
-			--actor:SetVelocity( actor:GetVelocity().x -difX * tetherPullAccel, actor:GetVelocity().y - difY * tetherPullAccel )
-			actor:SetVelocity( actor:GetVelocity().x -tetherax * tetherPullAccel, actor:GetVelocity().y - tetheray * tetherPullAccel )
-			--actor:SetVelocity( -difX * 30, -difY * 30 )
-			grounded = false
-			angle = 0
-			invincibilityFrames = 2
-			actor:CreateBox( bodyTypes.Normal, Layer_PlayerHitbox, 0, .1, 1, 1, 0 )
-			--end
+			if len > 0 then
+			
+				difX = difX / len
+				difY = difY / len
+				
+			--	actor:SetVelocity( actor:GetVelocity().x -tetherax * tetherPullAccel, actor:GetVelocity().y - tetheray * tetherPullAccel )
+				
+				--local full = actor:GetVelocity().x + actor:GetVelocity().y
+				--difX = actor:GetVelocity().x / full
+				--difY = actor:GetVelocity().y / full
+				
+				local go = true
+				
+				
+				
+				if actor:GetVelocity().x > maxTetherVel then
+					go = false
+				elseif actor:GetVelocity().x < -maxTetherVel then
+					go = false
+				elseif actor:GetVelocity().y > maxTetherVel then
+					go = false
+				elseif actor:GetVelocity().y < -maxTetherVel then
+					go = false
+				end
+				
+				if go then
+					actor:SetVelocity( -difX * ( currentTetherVel + 10 ), -difY * ( currentTetherVel + 10 ) )
+					currentTetherVel = currentTetherVel + tetherPullAccel
+					--actor:SetVelocity( actor:GetVelocity().x * 1.1, actor:GetVelocity().y * 1.1 )
+				end
+				--actor:SetVelocity( -difX * 30, -difY * 30 )
+				print( "vel from tether: " .. actor:GetVelocity().x .." ," .. actor:GetVelocity().y )
+				print( "difX: " .. difX .. ", difY: " .. difY )
+				grounded = false
+				angle = 0
+				
+				
+				invincibilityFrames = 2
+				actor:CreateBox( bodyTypes.Normal, Layer_PlayerHitbox, 0, .1, 1, 1, 0 )
+			end
 	    end
 		--tether:Message( actor, "explode", 0 )
 			
@@ -2104,12 +2158,13 @@ function UpdatePrePhysics()
                 if hitlagFrames == 0 and action ~= hitstun then -- and aggressor
                         actor:SetVelocity( hitlagVel.x, hitlagVel.y )    
                 else
-						
+						--actor:SetVelocity( 0, 0 )
 						--actor:SetVelocity( 
 						--actor:SetVelocity( prevVelocity.x, prevVelocity.y )    
                         --actor:SetVelocity( actor:GetVelocity().x + specialVel.x, actor:GetVelocity().y + specialVel.y )
                         --actor:SetSprite( 0, action[frame][1], action[frame][2] )
-                        --return
+						--print( "early ending" )
+                        return
                 end
         end
        
@@ -3037,7 +3092,7 @@ function HandleStageCollision( pointCount, point1, point2, normal, enabled )
                 shockwaveAngle = math.atan2( -normal.x, normal.y )
         end
  
-		print( "coll" )
+		--print( "coll" )
         if normal.y < -.5 and enabled then
 				
 				if not lastGrounded and currentInput:Down() and not ( currentInput:Right() or currentInput:Left() ) and normal.y > -1 then
@@ -3210,6 +3265,9 @@ function Message( sender, msg, tag )
 			--damaged or meter damaged?
 			print( "tether destroyed!" )
 			tetherOn = false
+		elseif msg == "tether_arrived" then
+			tetherArrived = true
+			print( "arrived here" )
         end
        
        
