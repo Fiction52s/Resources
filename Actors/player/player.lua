@@ -1053,16 +1053,6 @@ function ChooseAction()
                 --frame = 1
         end
 		
-		if (grounded and touchingRightWall and actor:IsFacingRight()) or (grounded and touchingLeftWall and not actor:IsFacingRight()) and 
-			(action == walk or action == dash ) then
-			if actor:GetVelocity().y < -groundMaxControlSpeed then
-				--grounded = false
-			--	print( "here: " .. actor:GetVelocity().x .. " , " .. actor:GetVelocity().y )
-				
-				--SetAction( jump )
-				--frame = 3
-			end
-		end
        
         if grounded and not actionChanged and ( action == airDash or action == airDashToFall or action == nil or action == jump or action == doubleJump or action == forwardAirAttack or action == upAirAttack or action == downAirAttack or action == wallCling or action == wallJump
                 or ( ( action == run or action == standToRun ) and not currentInput:Left() and not currentInput:Right() ) or action == fastFall ) then
@@ -1754,8 +1744,8 @@ function HandleAction()
 				actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y * 3 / 4 )
         end
         --print( "before d: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
-        if grounded and action ~= dash and action ~= hitstun and action ~= tetherPull and action ~= runningAttack then
-				if action ~= slide then				
+        if grounded and action ~= dash and action ~= hitstun and action ~= tetherPull then
+				if action ~= slide and action ~= runningAttack then				
 					if currentInput:Left() then
 							if actor:GetVelocity().x > 0 then
 									actor:SetVelocity( 0, 0 )
@@ -1778,7 +1768,7 @@ function HandleAction()
 					end
 				end
                
-                if currentInput:Left() or currentInput:Right() then
+                if currentInput:Left() or currentInput:Right() or action == runningAttack then
                         if actor:GetVelocity().y < 0 and groundNormal.x ~= 0 then
                                 if actor:IsFacingRight() and currentInput:Right() and not prevInput:Right() then
                                         --actor:SetVelocity( actor:GetVelocity().x - actor:GetVelocity().y, actor:GetVelocity().y )
@@ -2382,14 +2372,13 @@ function UpdatePrePhysics()
 			
 		end
 		
-        if lastGrounded and rcCount > 0 and ( action == stand or action == dashToStand or action == run or action == standToRun or action == dash or action == dashAttack or action == groundComboAttack1 or action == groundComboAttack2 or action == groundComboAttack3 or action == upGroundAttack or action == downGroundAttack or action == nil ) then
+        if lastGrounded and rcCount > 0 and ( action == stand or action == dashToStand or action == run or action == standToRun or action == dash or action == dashAttack or action == groundComboAttack1 or action == groundComboAttack2 or action == groundComboAttack3 or action == upGroundAttack or action == downGroundAttack or action == runningAttack or action == nil ) then
 				if groundNormal.y < -.5 then
 				grounded = true
 				else
 				grounded = false
 				
 				end
-				--print( "set grounded" )
         elseif not trueGrounded and ( rcCount == 0 or (rcCount == 1 and actor:GetVelocity().y < 0) ) then
                 grounded = false
 				
@@ -2990,8 +2979,9 @@ function HitByActor( otherActor, hitboxName, damage, hitlag, xhitstun, hurtboxTa
         local hitSuccessful = false
         hitlagFrames = hitlag
         SetAction( hitstun )
+		
 		actor:SetSpriteOffset( 0, 0, 0 )
-		--actor:ClearHitboxes()
+		actor:ClearHitboxes()
         frame = 1
         invincibilityFrames = 50
 		if actor:GetVelocity().y >= 0 then
