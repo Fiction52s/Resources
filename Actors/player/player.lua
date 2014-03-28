@@ -160,6 +160,7 @@ function Init()
         groundComboSet = actor:TileSetIndex( "groundcombo.png" )
 		uairSet = actor:TileSetIndex( "uair.png" )
 		dairSet = actor:TileSetIndex( "dair.png" )
+		runningAttackSet = actor:TileSetIndex( "runningattack.png" )
         --re = 5
         --run = {}
         --for i = 1, re * 10 do
@@ -185,6 +186,11 @@ function Init()
         for i = 1, 16 * 2 do
            run[i] = { runSet, ( i + 7 ) / 2 }
         end--]]
+		
+		runningAttack = {}
+		for i = 1, 10 * 2 do
+			runningAttack[i] = { runningAttackSet, (i - 1)/2 }
+		end
 		
 		slide = {}
 		for i = 1, 5 do
@@ -588,6 +594,10 @@ function ActionEnded()
 						frame = 5
 				elseif action == tetherPull then
 						frame = 1
+				elseif action == runningAttack then
+						SetAction( run )
+						frame = 1
+						actionChanged = false
                 else
                         SetAction( nil )
 						actionChanged = false
@@ -698,7 +708,7 @@ function ChooseAction()
 		
        
         if not actionChanged and currentInput.X and not prevInput.X and grounded then
-			if (action == stand or action == run or action == standToRun or action == nil or action == dashToStand or action == slide ) then
+			if (action == stand or action == standToRun or action == nil or action == dashToStand or action == slide ) then
 				if currentInput:Up() and not ( currentInput:Left() or currentInput:Right() ) then
 					SetAction( upGroundAttack )
 				elseif currentInput:Down() and not ( currentInput:Left() or currentInput:Right() ) then
@@ -710,7 +720,11 @@ function ChooseAction()
 			elseif action == dash then
 				SetAction( dashAttack )
 				frame = 1
+			elseif action == run then
+				SetAction( runningAttack )
+				frame = 1
 			end
+			
         end
 		
 		
@@ -1082,6 +1096,7 @@ function ChooseAction()
 end
  
 function HandleAction()
+		
         actor:ClearHitboxes()
         actor:ClearDetectionboxes()
         if not grounded and ( action == jump or action == doubleJump or action == airDash or action == bounceJump
@@ -1104,6 +1119,15 @@ function HandleAction()
                       --  actor:CreateBox( 6, Layer_ActorDetection, 0, 1.125, 1, .75, 0 )
         end
        
+		if action == runningAttack then
+			if actor:IsFacingRight() then
+				actor:SetSpriteOffset( 0, math.cos( angle ) * 1, math.sin( angle ) * 1 )
+			else
+				actor:SetSpriteOffset( 0, math.cos( angle ) * -1, math.sin( angle ) * -1 )
+			end
+			
+		end
+	   
         if action == tetherPull then
 			 local difX = actor:GetPosition().x - tetherPos.x
 			 local difY = actor:GetPosition().y - tetherPos.y
@@ -1730,7 +1754,7 @@ function HandleAction()
 				actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y * 3 / 4 )
         end
         --print( "before d: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
-        if grounded and action ~= dash and action ~= hitstun and action ~= tetherPull then
+        if grounded and action ~= dash and action ~= hitstun and action ~= tetherPull and action ~= runningAttack then
 				if action ~= slide then				
 					if currentInput:Left() then
 							if actor:GetVelocity().x > 0 then
@@ -2470,7 +2494,7 @@ function UpdatePrePhysics()
                 local testY = actor:GetPosition().y
 				--print( "groundNorm: " .. groundNormal.x .. ", " .. groundNormal.y )
 				--print( "pos:"  .. actor:GetPosition().x .. ", " .. actor:GetPosition().y )
-				if action == dash or action == dashAttack or action == groundComboAttack1 or action == groundComboAttack2 or action == groundComboAttack3 or action == slide then
+				if action == dash or action == dashAttack or action == groundComboAttack1 or action == groundComboAttack2 or action == groundComboAttack3 or action == slide or action == runningAttack then
 					angle = math.atan2( groundNormal.x, -groundNormal.y )--ath.atan2( groundNormal.y/groundNormal.x )--groundNormal.x / math.pi
 				else
 					angle = math.atan2( groundNormal.x, -groundNormal.y ) / 2--groundNormal.x / math.pi / 2
@@ -2633,7 +2657,7 @@ function UpdatePrePhysics()
 		if hitlagFrames > 0 then
 			actor:SetVelocity( 0, 0 )
 		end
-		
+
        
 	    actor:SetVelocity( actor:GetVelocity().x + carryVel.x, actor:GetVelocity().y + carryVel.y )
 	   
@@ -3276,11 +3300,9 @@ function Message( sender, msg, tag )
 			reflector = true
 		elseif msg == "tether_destroyed" then
 			--damaged or meter damaged?
-			print( "tether destroyed!" )
 			tetherOn = false
 		elseif msg == "tether_arrived" then
 			tetherArrived = true
-			print( "arrived here" )
 		elseif msg == "tether_damage" then
 			actor.health = actor.health - tag
 			if actor.health <= 0 then
