@@ -161,6 +161,7 @@ function Init()
 		uairSet = actor:TileSetIndex( "uair.png" )
 		dairSet = actor:TileSetIndex( "dair.png" )
 		runningAttackSet = actor:TileSetIndex( "runningattack.png" )
+		harrison3hitSet = actor:TileSetIndex( "harrison3hit.png" )
         --re = 5
         --run = {}
         --for i = 1, re * 10 do
@@ -336,20 +337,20 @@ function Init()
 		end
        
         groundComboAttack1 = {}
-        for i = 1, 15 do
+        for i = 1, 18 do
 		--for i = 1, 15 do
-			groundComboAttack1[i] = {groundComboSet, ( i - 1) }
+			groundComboAttack1[i] = {harrison3hitSet, ( i - 1 ) }
         end
 		
 		groundComboAttack2 = {}
         --for i = 1, 25 do
-		for i = 1, 25 do
-			groundComboAttack2[i] = {groundComboSet, (i-1) + 15}
+		for i = 1, 15 * 2 do
+			groundComboAttack2[i] = {harrison3hitSet, (i-1) / 2 + 16}
         end
 		
 		groundComboAttack3 = {}
-        for i = 1, 35 do
-			groundComboAttack3[i] = {groundComboSet,(i-1) + 40 }
+        for i = 1, 12 * 2 do
+			groundComboAttack3[i] = {harrison3hitSet,(i-1) / 2 + 30 }
         end
 		
 		downGroundAttack = {}
@@ -708,7 +709,7 @@ function ChooseAction()
 		
        
         if not actionChanged and currentInput.X and not prevInput.X and grounded then
-			if (action == stand or action == standToRun or action == nil or action == dashToStand or action == slide ) then
+			if (action == stand or action == nil or action == dashToStand or action == slide ) then
 				if currentInput:Up() and not ( currentInput:Left() or currentInput:Right() ) then
 					SetAction( upGroundAttack )
 				elseif currentInput:Down() and not ( currentInput:Left() or currentInput:Right() ) then
@@ -720,12 +721,13 @@ function ChooseAction()
 			elseif action == dash then
 				SetAction( dashAttack )
 				frame = 1
-			elseif action == run then
+			elseif action == run or action == standToRun then
 				SetAction( runningAttack )
 				frame = 1
 			end
 			
         end
+		
 		
 		
 		
@@ -943,13 +945,28 @@ function ChooseAction()
 		end
 		
 		--and not( currentInput:Left() or currentInput:Right() )
+		power_boosterUpgrade = true
         if power_boosterUpgrade and not actionChanged then
-                if currentInput.B and not prevInput.B and currentInput:Down() and not grounded and ( action ~= forwardAirAttack or (action == forwardAirAttack and frame > 7 ))
-					and ( action ~= upAirAttack or (action == upAirAttack and frame > 7 )) and ( action ~= downAirAttack or (action == downAirAttack and frame > 7 )) and action ~= gravitySlash then--and not ( currentInput:Left() or currentInput:Right() )
-                        if action ~= fastFall then
-                                SetAction( fastFall )
-                                frame = 1
-                        end
+                if currentInput.B and not prevInput.B and currentInput:Down() and not grounded and action ~= gravitySlash and action ~= fastFall then
+					if action == forwardAirAttack or action == upAirAttack or action == downAirAttack then
+						if actor:GetVelocity().y < 0 then
+							actor:SetVelocity( actor:GetVelocity().x * 2 / 3, fastFallBoost )
+						else
+							actor:SetVelocity( actor:GetVelocity().x * 2 / 3, actor:GetVelocity().y + fastFallBoost )
+						end
+						actionChanged = true
+					else
+                        SetAction( fastFall )
+                        frame = 1
+					end
+					--if ( action ~= forwardAirAttack or (action == forwardAirAttack and frame > 7 )) 
+					--and ( action ~= upAirAttack or (action == upAirAttack and frame > 7 )) 
+					--and ( action ~= downAirAttack or (action == downAirAttack and frame > 7 )) then--and not ( currentInput:Left() or currentInput:Right() )
+                       
+					--else
+						
+					--end
+					
                 end
         end
        
@@ -1109,13 +1126,14 @@ function HandleAction()
                       --  actor:CreateBox( 6, Layer_ActorDetection, 0, 1.125, 1, .75, 0 )
         end
        
-		if action == runningAttack then
+		
+		
+		if action == groundComboAttack1 or action == groundComboAttack2 or action == groundComboAttack3 then
 			if actor:IsFacingRight() then
-				actor:SetSpriteOffset( 0, math.cos( angle ) * 1, math.sin( angle ) * 1 )
+				actor:SetSpriteOffset( 0, math.cos( angle ) * 1.3 + math.sin( angle ) * -.3, math.sin( angle ) * 1.3 + math.cos( angle ) * -.3 )
 			else
-				actor:SetSpriteOffset( 0, math.cos( angle ) * -1, math.sin( angle ) * -1 )
+				actor:SetSpriteOffset( 0, math.cos( angle ) * -1.3 + math.sin( angle ) * -.3, math.sin( angle ) * -1.3 + math.cos( angle ) * -.3 )
 			end
-			
 		end
 	   
         if action == tetherPull then
@@ -1745,8 +1763,9 @@ function HandleAction()
         end
         --print( "before d: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
         if grounded and action ~= dash and action ~= hitstun and action ~= tetherPull then
-				if action ~= slide and action ~= runningAttack then				
+				if action ~= slide then				
 					if currentInput:Left() then
+						if action ~= runningAttack or not actor:IsFacingRight() then
 							if actor:GetVelocity().x > 0 then
 									actor:SetVelocity( 0, 0 )
 							end
@@ -1755,7 +1774,14 @@ function HandleAction()
 							else
 									actor:SetVelocity( math.max( -maxRunSpeed, actor:GetVelocity().x), actor:GetVelocity().y )
 							end
+						elseif action == runningAttack then
+							if actor:GetVelocity().x >= 0 then
+									actor:SetVelocity( -groundMaxControlSpeed, 0 )
+									actor:FaceLeft()
+							end
+						end
 					elseif currentInput:Right() then
+						if action ~= runningAttack or actor:IsFacingRight() then
 							if actor:GetVelocity().x < 0 then
 									actor:SetVelocity( 0, 0 )
 							end
@@ -1764,7 +1790,12 @@ function HandleAction()
 							else
 									actor:SetVelocity( math.min( maxRunSpeed, actor:GetVelocity().x), actor:GetVelocity().y )
 							end
-	 
+						elseif action == runningAttack then
+							if actor:GetVelocity().x <= 0 then
+									actor:SetVelocity( groundMaxControlSpeed, 0 )
+									actor:FaceRight()
+							end
+						end
 					end
 				end
                
@@ -1797,6 +1828,16 @@ function HandleAction()
                 --print( "e: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
         end
         
+		if action == runningAttack then
+			if actor:IsFacingRight() then
+				actor:SetSpriteOffset( 0, math.cos( angle ) * 1, math.sin( angle ) * 1 )
+			else
+				actor:SetSpriteOffset( 0, math.cos( angle ) * -1, math.sin( angle ) * -1 )
+			end
+			
+		end
+		
+		
         local a = angle
         local c = math.cos( a )
         local s = math.sin( a )
@@ -2758,6 +2799,7 @@ function UpdatePrePhysics()
         --print( "frame: " .. frame )
 	   --print( "gnorm: " .. groundNormal.x .. ", " .. groundNormal.y )
       print( "vel1: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+	  print( "sprite offset: " .. actor:GetSpriteOffset(0).x ..", " .. actor:GetSpriteOffset(0).y )
 	 -- print( "pos: " .. actor:GetPosition().x .. ", " .. actor:GetPosition().y )
         --print( "special: " .. specialVel.x .. ", " .. specialVel.y )
        
@@ -2940,12 +2982,18 @@ function HitActor( otherActor, hitboxTag )
                 --print( "testing blah" )
         end
         --5
-        return hitboxStrings[hitboxTag], 5, 3, 0, 0
+        return hitboxStrings[hitboxTag], 10, 3, 0, 0
         --return type, damage, hitlag, hitstun, centerX (relative to this actor)
 end
  
 function ConfirmHit( otheractor, hitboxName, damage, hitlag, xx )
-        hitlagFrames = hitlag
+		if hitlagFrames == 0 then
+			
+		else
+			--hitlagFrames = hitlagFrames + 1
+		end
+		hitlagFrames = hitlag
+		
 		
 		if hitlagFrames > 0 and not hitlagVelSet then
 			hitlagVel.x = actor:GetVelocity().x
@@ -3308,6 +3356,116 @@ end
 function Die()
        
 end
+
+function SaveState()
+        save_tetherArrived = tetherArrived
+        
+		save_health = actor.health
+		
+		save_tetherPosX = tetherPos.x
+		save_tetherPosY = tetherPos.y
+		
+		save_currentTetherVel = currentTetherVel
+	   
+        save_reflector = reflector
+        
+		save_lastGrounded = lastGrounded
+		save_grounded = grounded
+		save_killed = killed
+		
+		save_rcFraction = rcFraction
+		save_rcPointX = rcPoint.x
+		save_rcPointY = rcPoint.y
+		save_rcNormalX = rcNormal.x
+		save_rcNormalY = rcNormal.y
+		save_rcCount = rcCount
+		
+		save_rampSlopeAdjust = rampSlopeAdjust
+		
+		save_hitlagVelSet = hitlagVelSet
+		save_hitlagVelX = hitlagVel.x
+		save_hitlagVelY = hitlagVel.y
+       
+        --specialVel.x = 0
+        --specialVel.y = 0
+       
+        --specialAcc.x = 0
+        --specialAcc.y = 0
+       
+	    save_oldGroundNormalX = oldGroundNormal.x
+		save_oldGroundNormalY = oldGroundNormal.y
+	   
+		save_carryVelX = carryVel.x
+		save_carryVelY = carryVel.y
+	   
+        save_airControlLock = airControlLock
+        
+		save_groundLockActor = groundLockActor
+       
+        save_wallStop = wallStop
+        --groundNormal.x = 0
+        --groundNormal.y = 0
+       
+        save_slopeSlow = slopeSlow
+		save_slopeAccel = slopeAccel
+		save_trueGrounded = trueGrounded
+       
+	   
+		save_forcedAirCounter = forcedAirCounter
+        
+        save_canInterruptJump = canInterruptJump
+		save_grav = grav
+        
+		save_framesInAir = framesInAir
+		
+        save_actorRightWallJump = actorRightWallJump
+		save_actorLeftWallJump = actorLeftWallJump
+		
+		save_lastAction = lastAction
+        save_touchingRightWall = touchingRightWall
+        save_touchingLeftWall = touchingLeftWall
+		
+		save_prevPositionX = save_prevPosition.x
+		save_prevPositionY = save_prevPosition.y
+		
+		save_angle = angle
+        
+		save_prevVelocityX = prevVelocity.x
+		save_prevVelocityY = prevVelocity.y
+		
+		save_playerWidth = playerWidth
+		save_playerHeight = playerHeight
+        save_centerOffsetX = centerOffsetX 
+        
+        save_prevAction = prevAction
+		save_prevFrame = prevFrame
+		save_frame = frame
+		save_action = action
+		save_pos_x = actor:GetPosition().x
+		save_pos_y = actor:GetPosition().y
+        save_vel_x = actor:GetVelocity().x
+		save_vel_y = actor:GetVelocity().y
+		
+		save_hasGravitySlash = hasGravitySlash
+		save_gravityReverseCounter = gravityReverseCounter
+		
+		save_hasAirDash = hasAirDash
+		save_airDashingRight = airDashingRight
+		
+		save_framesDashing = framesDashing
+		
+		save_hasDoubleJump = hasDoubleJump
+		
+		save_dropThrough = dropThrough
+		
+		save_hitlagFrames = hitlagFrames
+		save_invincibilityFrames = invincibilityFrames    
+end
+
+function LoadState()
+end
+
+
 
 function Sword( xOffset, yOffset, xSize, ySize )
 	local a = angle-- * 3.5
