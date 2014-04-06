@@ -627,6 +627,8 @@ function ChooseAction()
                 actionChanged = true
         end
 		
+		
+		
 		if action == tetherPull then
 			local dX = actor:GetPosition().x - tether:GetPosition().x
 			local dY = actor:GetPosition().y - tether:GetPosition().y
@@ -649,8 +651,18 @@ function ChooseAction()
 			end
 		end
 		
+		
+		if currentInput.leftShoulder and not prevInput.leftShoulder and not stage.cloneWorld then
+			stage.cloneWorldStart = true
+		end
+		
+		if currentInput.leftShoulder and not prevInput.leftShoulder and stage.cloneWorld then
+			stage.cloneWorldStart = true
+		end
+		
+		
 		tetherArrived = false
-			
+		
 		
         if action ~= tetherPull and not actionChanged and currentInput.Y and not prevInput.Y and 
 		(action == wallJump or action == wallCling or action == stand or action == dashToStand or action == dash or action == run 
@@ -3358,111 +3370,209 @@ function Die()
 end
 
 function SaveState()
-        save_tetherArrived = tetherArrived
-        
-		save_health = actor.health
-		
-		save_tetherPosX = tetherPos.x
-		save_tetherPosY = tetherPos.y
-		
-		save_currentTetherVel = currentTetherVel
-	   
-        save_reflector = reflector
-        
-		save_lastGrounded = lastGrounded
-		save_grounded = grounded
-		save_killed = killed
-		
-		save_rcFraction = rcFraction
-		save_rcPointX = rcPoint.x
-		save_rcPointY = rcPoint.y
-		save_rcNormalX = rcNormal.x
-		save_rcNormalY = rcNormal.y
-		save_rcCount = rcCount
-		
-		save_rampSlopeAdjust = rampSlopeAdjust
-		
-		save_hitlagVelSet = hitlagVelSet
-		save_hitlagVelX = hitlagVel.x
-		save_hitlagVelY = hitlagVel.y
-       
-        --specialVel.x = 0
-        --specialVel.y = 0
-       
-        --specialAcc.x = 0
-        --specialAcc.y = 0
-       
-	    save_oldGroundNormalX = oldGroundNormal.x
-		save_oldGroundNormalY = oldGroundNormal.y
-	   
-		save_carryVelX = carryVel.x
-		save_carryVelY = carryVel.y
-	   
-        save_airControlLock = airControlLock
-        
-		save_groundLockActor = groundLockActor
-       
-        save_wallStop = wallStop
-        --groundNormal.x = 0
-        --groundNormal.y = 0
-       
-        save_slopeSlow = slopeSlow
-		save_slopeAccel = slopeAccel
-		save_trueGrounded = trueGrounded
-       
-	   
-		save_forcedAirCounter = forcedAirCounter
-        
-        save_canInterruptJump = canInterruptJump
-		save_grav = grav
-        
-		save_framesInAir = framesInAir
-		
-        save_actorRightWallJump = actorRightWallJump
-		save_actorLeftWallJump = actorLeftWallJump
-		
-		save_lastAction = lastAction
-        save_touchingRightWall = touchingRightWall
-        save_touchingLeftWall = touchingLeftWall
-		
-		save_prevPositionX = save_prevPosition.x
-		save_prevPositionY = save_prevPosition.y
-		
-		save_angle = angle
-        
-		save_prevVelocityX = prevVelocity.x
-		save_prevVelocityY = prevVelocity.y
-		
-		save_playerWidth = playerWidth
-		save_playerHeight = playerHeight
-        save_centerOffsetX = centerOffsetX 
-        
-        save_prevAction = prevAction
-		save_prevFrame = prevFrame
-		save_frame = frame
-		save_action = action
-		save_pos_x = actor:GetPosition().x
-		save_pos_y = actor:GetPosition().y
-        save_vel_x = actor:GetVelocity().x
-		save_vel_y = actor:GetVelocity().y
-		
-		save_hasGravitySlash = hasGravitySlash
-		save_gravityReverseCounter = gravityReverseCounter
-		
-		save_hasAirDash = hasAirDash
-		save_airDashingRight = airDashingRight
-		
-		save_framesDashing = framesDashing
-		
-		save_hasDoubleJump = hasDoubleJump
-		
-		save_dropThrough = dropThrough
-		
-		save_hitlagFrames = hitlagFrames
-		save_invincibilityFrames = invincibilityFrames    
+	save_tetherArrived = tetherArrived
+	
+	
+	save_tetherPosX = tetherPos.x
+	save_tetherPosY = tetherPos.y
+	
+	save_currentTetherVel = currentTetherVel
+   
+	save_reflector = reflector
+	
+	save_lastGrounded = lastGrounded
+	save_grounded = grounded
+	save_killed = killed
+	
+	save_rcFraction = rcFraction
+	save_rcPointX = rcPoint.x
+	save_rcPointY = rcPoint.y
+	save_rcNormalX = rcNormal.x
+	save_rcNormalY = rcNormal.y
+	save_rcCount = rcCount
+	
+	save_rampSlopeAdjust = rampSlopeAdjust
+	
+	save_hitlagVelSet = hitlagVelSet
+	save_hitlagVelX = hitlagVel.x
+	save_hitlagVelY = hitlagVel.y
+   
+	--specialVel.x = 0
+	--specialVel.y = 0
+   
+	--specialAcc.x = 0
+	--specialAcc.y = 0
+   
+	save_oldGroundNormalX = oldGroundNormal.x
+	save_oldGroundNormalY = oldGroundNormal.y
+   
+	save_carryVelX = carryVel.x
+	save_carryVelY = carryVel.y
+   
+	save_airControlLock = airControlLock
+	
+	save_groundLockActor = groundLockActor
+   
+	save_wallStop = wallStop
+	--groundNormal.x = 0
+	--groundNormal.y = 0
+   
+	save_slopeSlow = slopeSlow
+	save_slopeAccel = slopeAccel
+	save_trueGrounded = trueGrounded
+   
+   
+	save_forcedAirCounter = forcedAirCounter
+	
+	save_canInterruptJump = canInterruptJump
+	save_grav = grav
+	
+	save_framesInAir = framesInAir
+	
+	save_actorRightWallJump = actorRightWallJump
+	save_actorLeftWallJump = actorLeftWallJump
+	
+	save_lastAction = lastAction
+	save_touchingRightWall = touchingRightWall
+	save_touchingLeftWall = touchingLeftWall
+	
+	save_prevPositionX = save_prevPosition.x
+	save_prevPositionY = save_prevPosition.y
+	
+	save_angle = angle
+	
+	save_prevVelocityX = prevVelocity.x
+	save_prevVelocityY = prevVelocity.y
+	
+	save_playerWidth = playerWidth
+	save_playerHeight = playerHeight
+	save_centerOffsetX = centerOffsetX 
+	
+	save_prevAction = prevAction
+	save_prevFrame = prevFrame
+	save_frame = frame
+	save_action = action
+	save_pos_x = actor:GetPosition().x
+	save_pos_y = actor:GetPosition().y
+	save_vel_x = actor:GetVelocity().x
+	save_vel_y = actor:GetVelocity().y
+	
+	save_hasGravitySlash = hasGravitySlash
+	save_gravityReverseCounter = gravityReverseCounter
+	
+	save_hasAirDash = hasAirDash
+	save_airDashingRight = airDashingRight
+	
+	save_framesDashing = framesDashing
+	
+	save_hasDoubleJump = hasDoubleJump
+	
+	save_dropThrough = dropThrough
+	
+	save_hitlagFrames = hitlagFrames
+	save_invincibilityFrames = invincibilityFrames    
 end
 
 function LoadState()
+
+	save_tetherArrived = tetherArrived
+		
+	tetherPos.x = save_tetherPosX 
+	tetherPos.y = save_tetherPosY 
+	
+	currentTetherVel = save_currentTetherVel 
+   
+	reflector = save_reflector 
+	
+	lastGrounded = save_lastGrounded 
+	grounded = save_grounded 
+	killed = save_killed 
+	
+	rcFraction = save_rcFraction 
+	
+	rcPoint.x = save_rcPointX 
+	rcPoint.y = save_rcPointY 
+	rcNormal.x = save_rcNormalX 
+	rcNormal.y = save_rcNormalY 
+	rcCount = save_rcCount
+	
+	rampSlopeAdjust = save_rampSlopeAdjust 
+	
+	hitlagVelSet = save_hitlagVelSet 
+	hitlagVel.x = save_hitlagVelX 
+	hitlagVel.y = save_hitlagVelY 
+   
+	--specialVel.x 0
+	--specialVel.y 0
+   
+	--specialAcc.x 0
+	--specialAcc.y 0
+   
+	oldGroundNormal.x = save_oldGroundNormalX 
+	oldGroundNormal.y = save_oldGroundNormalY 
+   
+	carryVel.x = save_carryVelX 
+	carryVel.y = save_carryVelY 
+   
+	airControlLock = save_airControlLock 
+	
+	groundLockActor = save_groundLockActor 
+   
+	wallStop = save_wallStop 
+	--groundNormal.x 0
+	--groundNormal.y 0
+   
+	slopeSlow = save_slopeSlow 
+	slopeAccel = save_slopeAccel 
+	trueGrounded = save_trueGrounded
+   
+   
+	forcedAirCounter = save_forcedAirCounter 
+	
+	canInterruptJump = save_canInterruptJump 
+	grav = save_grav 
+	
+	framesInAir = save_framesInAir 
+	
+	actorRightWallJump = save_actorRightWallJump 
+	actorLeftWallJump = save_actorLeftWallJump 
+	
+	lastAction= save_lastAction 
+	touchingRightWall = save_touchingRightWall
+	touchingLeftWall = save_touchingLeftWall 
+	
+	save_prevPosition.x = save_prevPositionX 
+	save_prevPosition.y = save_prevPositionY 
+	
+	angle = save_angle 
+	
+	prevVelocity.x = save_prevVelocityX 
+	prevVelocity.y = save_prevVelocityY 
+	
+	playerWidth= save_playerWidth 
+	playerHeight = save_playerHeight 
+	centerOffsetX  = save_centerOffsetX 
+	
+	prevAction = save_prevAction 
+	prevFrame = save_prevFrame 
+	frame = save_frame 
+	action = save_action 
+	
+	
+	hasGravitySlash = save_hasGravitySlash 
+	gravityReverseCounter = save_gravityReverseCounter 
+	
+	hasAirDash = save_hasAirDash 
+	airDashingRight = save_airDashingRight 
+	
+	framesDashing = save_framesDashing 
+	
+	hasDoubleJump = save_hasDoubleJump 
+	
+	dropThrough = save_dropThrough 
+	
+	hitlagFrames = save_hitlagFrames 
+	invincibilityFrames = save_invincibilityFrames 
 end
 
 
