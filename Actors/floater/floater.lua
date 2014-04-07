@@ -279,6 +279,40 @@ function Die()
 	
 end
 
+function SaveState()
+	--note: 1 is the first index in Lua, not 0
+	save_health = health
+	save_slowCounter = slowCounter
+	save_slowFactor = slowFactor
+	save_oldSlowFactor = oldSlowFactor
+	--save_spriteAngle = spriteAngle
+	--save_angle = angle
+	
+	--save_action = action
+	--save_frame = frame
+	
+	if framesToSwitch > 0 then
+		save_accelx = accelx
+		save_accely = accely
+		save_frameCount = frameCount
+		
+	end
+end
+
+function LoadState()
+	health = save_health
+	slowCounter = save_slowCounter
+	slowFactor = save_slowFactor
+	oldSlowFactor = save_oldSlowFactor
+	
+	if framesToSwitch > 0 then
+		accelx = save_accelx
+		accely = save_accely
+		frameCount = save_frameCount
+		
+	end
+end
+
 --delta = ACTOR:b2Vec2()
 deltax = 0
 deltay = 0

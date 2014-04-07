@@ -23,5 +23,5 @@ void main ()
 		gl_FragColor = gl_Color * pixel;
 	}
 	//gl_FragColor = gl_Color * pixel;
-	gl_FragColor = gl_Color * pixel;
+	//gl_FragColor = gl_Color * pixel;
 }  

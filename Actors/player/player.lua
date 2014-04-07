@@ -657,14 +657,32 @@ function ChooseAction()
 		end
 		
 		if currentInput.leftShoulder and not prevInput.leftShoulder and stage.cloneWorld then
-			stage.cloneWorldStart = true
+			stage.cloneWorldExtra = true
 		end
+		
+		if currentInput:AltLeft() and not prevInput:AltLeft() and stage.cloneWorld then
+			stage.cloneWorldRevert = true
+		end
+		
+		--if currentInput:AltRight() and not prevInput:AltRight() and stage.cloneWorld then
+		--	stage.cloneWorldCollapse = true
+		--end
+		
+		if stage.cloneWorld and currentInput.Y and not prevInput.Y then
+			--collapse
+			--stage.cloneWorldCollapse = true
+			
+		end
+		
+		
+		
+		
 		
 		
 		tetherArrived = false
 		
 		
-        if action ~= tetherPull and not actionChanged and currentInput.Y and not prevInput.Y and 
+        if not stage.cloneWorld and action ~= tetherPull and not actionChanged and currentInput.Y and not prevInput.Y and 
 		(action == wallJump or action == wallCling or action == stand or action == dashToStand or action == dash or action == run 
 		or action == standToRun or (action == forwardAirAttack and frame > 7 ) or (action == downAirAttack and frame > 7 )
 		or (action == upAirAttack and frame > 7 ) or action == jump or action == doubleJump or action == airDashToFall 
@@ -2810,8 +2828,10 @@ function UpdatePrePhysics()
         --print( "pos: " .. actor:GetPosition().x .. ", " .. actor:GetPosition().y )
         --print( "frame: " .. frame )
 	   --print( "gnorm: " .. groundNormal.x .. ", " .. groundNormal.y )
-      print( "vel1: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
-	  print( "sprite offset: " .. actor:GetSpriteOffset(0).x ..", " .. actor:GetSpriteOffset(0).y )
+    --  print( "vel1: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+--	  print( "sprite offset: " .. actor:GetSpriteOffset(0).x ..", " .. actor:GetSpriteOffset(0).y )
+
+
 	 -- print( "pos: " .. actor:GetPosition().x .. ", " .. actor:GetPosition().y )
         --print( "special: " .. specialVel.x .. ", " .. specialVel.y )
        
@@ -2881,7 +2901,7 @@ function UpdatePostPhysics()
 		end
 		
        
-       print( "vel2: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+    --   print( "vel2: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
         if hitlagFrames > 0 then
                 return
         end
@@ -2940,7 +2960,7 @@ function UpdatePostPhysics()
 			--actor:SetVelocity( prevVelocity.x, prevVelocity.x * -groundNormal.x / groundNormal.y )
 			
 	    end
-		print( "--------------------------------------" )
+		--print( "--------------------------------------" )
 		--this is super buggy still TT
 		if not reflector and not currentInput:Down() and actor:GetVelocity().y >= -extraVel and (action == jump or action == doubleJump or ( action == wallJump and frame > 15--[[25--]] ) or ( action == gravitySlash and frame > 18 ) ) and ( touchingRightWall and currentInput:Right() or touchingLeftWall and currentInput:Left() ) and action ~= airDash and action ~= wallCling then
 		--if not lastGrounded and ( touchingRightWall and not currentInput:Left() or touchingLeftWall and not currentInput:Right() ) and action ~= wallJump and action ~= gravitySlash and action ~= airDash  then
@@ -3436,8 +3456,8 @@ function SaveState()
 	save_touchingRightWall = touchingRightWall
 	save_touchingLeftWall = touchingLeftWall
 	
-	save_prevPositionX = save_prevPosition.x
-	save_prevPositionY = save_prevPosition.y
+	save_prevPositionX = prevPosition.x
+	save_prevPositionY = prevPosition.y
 	
 	save_angle = angle
 	
@@ -3471,10 +3491,10 @@ function SaveState()
 	
 	save_hitlagFrames = hitlagFrames
 	save_invincibilityFrames = invincibilityFrames    
+
 end
 
 function LoadState()
-
 	save_tetherArrived = tetherArrived
 		
 	tetherPos.x = save_tetherPosX 
@@ -3541,8 +3561,8 @@ function LoadState()
 	touchingRightWall = save_touchingRightWall
 	touchingLeftWall = save_touchingLeftWall 
 	
-	save_prevPosition.x = save_prevPositionX 
-	save_prevPosition.y = save_prevPositionY 
+	prevPosition.x = save_prevPositionX 
+	prevPosition.y = save_prevPositionY 
 	
 	angle = save_angle 
 	
