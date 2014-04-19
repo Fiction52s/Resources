@@ -267,7 +267,7 @@ function Init()
         end
        
         doubleJump = {}
-        for i = 1, 1 * 34 do
+        for i = 1, 1 * 39 do
 			doubleJump[i] = { doubleJumpSet, ( i - 1 ) / 1}
         end
         doubleJumpStrength = 26--25
@@ -669,6 +669,12 @@ function ChooseAction()
 		--end
 		
 		if stage.cloneWorld and currentInput.Y and not prevInput.Y then
+			--print( "creating the time wave" )
+			--local vel = ACTOR:b2Vec2()
+			--vel.x = 0
+			--vel.y = 0
+			--stage:CreateActor( "timewave", actor:GetPosition(), vel, actor:IsFacingRight(), false, 0, actor )
+			--print( "creating the time wave" )
 			--collapse
 			--stage.cloneWorldCollapse = true
 			
@@ -1101,7 +1107,7 @@ function ChooseAction()
         end
 		
        
-        if grounded and not actionChanged and ( action == airDash or action == airDashToFall or action == nil or action == jump or action == doubleJump or action == forwardAirAttack or action == upAirAttack or action == downAirAttack or action == wallCling or action == wallJump
+        if grounded and not actionChanged and ( (action == airDash and groundNormal.y ~= -1 ) or action == airDashToFall or action == nil or action == jump or action == doubleJump or action == forwardAirAttack or action == upAirAttack or action == downAirAttack or action == wallCling or action == wallJump
                 or ( ( action == run or action == standToRun ) and not currentInput:Left() and not currentInput:Right() ) or action == fastFall ) then
 				
 				--if action == airDash then
@@ -1160,9 +1166,11 @@ function HandleAction()
 		
 		if action == groundComboAttack1 or action == groundComboAttack2 or action == groundComboAttack3 then
 			if actor:IsFacingRight() then
-				actor:SetSpriteOffset( 0, math.cos( angle ) * 1.3 + math.sin( angle ) * -.3, math.sin( angle ) * 1.3 + math.cos( angle ) * -.3 )
+				actor:SetSpriteOffset( 0, 1.5, -.4 )
+				--actor:SetSpriteOffset( 0, math.cos( angle ) * 1.3 + math.sin( angle ) * -.3, math.sin( angle ) * 1.3 + math.cos( angle ) * -.6 )
 			else
-				actor:SetSpriteOffset( 0, math.cos( angle ) * -1.3 + math.sin( angle ) * -.3, math.sin( angle ) * -1.3 + math.cos( angle ) * -.3 )
+				actor:SetSpriteOffset( 0, -1.5, -.4 )
+				--actor:SetSpriteOffset( 0, math.cos( angle ) * -1.3 + math.sin( angle ) * -.3, math.sin( angle ) * -1.3 + math.cos( angle ) * -.6 )
 			end
 		end
 	   
@@ -1407,37 +1415,66 @@ function HandleAction()
 			end
 		
 		
-			if frame == 3 then
-			
-			
+			if frame == 3 or frame == 4 or frame == 5 or frame == 6 then
 				
-			
-				for i = 1, trailCount do
-					pastaction[i] = action
-					pastpos[i].x = actor:GetPosition().x
-					pastpos[i].y = actor:GetPosition().y
-					pastangle[i] = 0
-					pastframe[i] = frame
-				end
+				if frame == 3 then
 				
-                actor:SetSpriteOffset( 0, 0, .5 )
-				local xoff = .3
-				local yoff = .5---.4
-				if not actor:IsFacingRight() then
-					xoff = -xoff
-				end
-				actor:ClearPhysicsboxes()
-				
-				actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, .1, .5, .5, 0 )
-				if actor:IsFacingRight() then
-				
-					actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, .2, .3, 1, .4, 0 )
-				else
+					actor:SetSpriteOffset( 0, 0, .5 )
+					local xoff = .3
+					local yoff = .5---.4
+					if not actor:IsFacingRight() then
+						xoff = -xoff
+					end
+
 					
-					actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, -.2, .3, 1, .4, 0 )
+					actor:ClearPhysicsboxes()
+					
+					actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, .1, .5, .5, 0 )
+					if actor:IsFacingRight() then
+						actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, .2, .3, 1, .4, 0 )
+						--actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, .2, .3, 1, .4, 0 )
+					else
+						actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, -.2, .3, 1, .4, 0 )
+						--actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, -.2, .3, 1, .4, 0 )
+					end
+					actor:ClearHurtboxes()
+					actor:CreateBox( bodyTypes.Normal, Layer_PlayerHurtbox, xoff, yoff - .2, 1, .8, 0 )
+				
+				elseif frame == 4 then
+					actor:ClearPhysicsboxes()
+					
+					actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, .1, .5, .5, 0 )
+					if actor:IsFacingRight() then
+						actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, .2, .3, 1.5, .4, 0 )
+						--actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, .2, .3, 1, .4, 0 )
+					else
+						actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, -.2, .3, 1.5, .4, 0 )
+						--actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, -.2, .3, 1, .4, 0 )
+					end
+				elseif frame == 5 then
+					actor:ClearPhysicsboxes()
+					
+					actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, .1, .5, .5, 0 )
+					if actor:IsFacingRight() then
+						actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, .2, .3, 2.25, .4, 0 )
+						--actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, .2, .3, 1, .4, 0 )
+					else
+						actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, -.2, .3, 2.25, .4, 0 )
+						--actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, -.2, .3, 1, .4, 0 )
+					end
+				elseif frame == 6 then
+					actor:ClearPhysicsboxes()
+					
+					actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, .1, .5, .5, 0 )
+					if actor:IsFacingRight() then
+						actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, .2, .3, 3, .4, 0 )
+						--actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, .2, .3, 1, .4, 0 )
+					else
+						actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, -.2, .3, 3, .4, 0 )
+						--actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, -.2, .3, 1, .4, 0 )
+					end
 				end
-				actor:ClearHurtboxes()
-				actor:CreateBox( bodyTypes.Normal, Layer_PlayerHurtbox, xoff, yoff - .2, 1, .8, 0 )
+				
 				
 				
 				
@@ -1636,7 +1673,7 @@ function HandleAction()
 	   --elseif action == slide then print( "SLIDE ````````````````````````" )
 	   --elseif action == stand then print( "stand~~~`~`````````````````````" )
 	   --end
-        if grounded and not lastGrounded and action ~= stand and action ~= fastFall and action ~= slide then--( currentInput.Left() or currentInput.Right() ) then
+        if grounded and not lastGrounded and action ~= stand and action ~= fastFall and action ~= slide and action ~= airDash then--( currentInput.Left() or currentInput.Right() ) then
                 --this slows down the actor each time he hits the ground, so his extra speed runs out over multiple jumps
                 --actor:SetVelocity( actor:GetVelocity().x * 1 , actor:GetVelocity().y * .7 )
 				--if action == jump then
@@ -1963,10 +2000,10 @@ function HandleAction()
 		if grounded and action == airDash then
 			print( "here" )
 			if actor:IsReversed() then
-				   actor:SetPosition( actor:GetPosition().x, minGroundY + playerHeight )
+				  -- actor:SetPosition( actor:GetPosition().x, minGroundY + playerHeight )
 			else
 					--print( "lock1" )
-				   actor:SetPosition( actor:GetPosition().x, minGroundY - playerHeight )
+				--   actor:SetPosition( actor:GetPosition().x, minGroundY - playerHeight )
 			end
 		end
        
@@ -2832,7 +2869,7 @@ function UpdatePrePhysics()
 --	  print( "sprite offset: " .. actor:GetSpriteOffset(0).x ..", " .. actor:GetSpriteOffset(0).y )
 
 
-	 -- print( "pos: " .. actor:GetPosition().x .. ", " .. actor:GetPosition().y )
+	  print( "pos: " .. actor:GetPosition().x .. ", " .. actor:GetPosition().y )
         --print( "special: " .. specialVel.x .. ", " .. specialVel.y )
        
         prevPosition.x = actor:GetPosition().x
@@ -3014,7 +3051,20 @@ function HitActor( otherActor, hitboxTag )
                 --print( "testing blah" )
         end
         --5
+		
+		ghostIndex = 0
+		if hitboxTag >= 100 then
+			ghostIndex = -1
+			while hitboxTag >= 100 do
+				hitboxTag = hitboxTag - 100
+				ghostIndex = ghostIndex + 1
+			end
+			noHitlag = true --dont pause the actor for this
+		end
+		
+		print( "hitbox tag: " .. hitboxTag )
         return hitboxStrings[hitboxTag], 10, 3, 0, 0
+
         --return type, damage, hitlag, hitstun, centerX (relative to this actor)
 end
  
@@ -3024,15 +3074,23 @@ function ConfirmHit( otheractor, hitboxName, damage, hitlag, xx )
 		else
 			--hitlagFrames = hitlagFrames + 1
 		end
-		hitlagFrames = hitlag
-		
-		
-		if hitlagFrames > 0 and not hitlagVelSet then
-			hitlagVel.x = actor:GetVelocity().x
-			hitlagVel.y = actor:GetVelocity().y
-			actor:SetVelocity( 0, 0 )
-			hitlagVelSet = true
+		if noHitlag then
+			player:SetGhostHitlag( ghostIndex, hitlagFrames )
+		else
+			hitlagFrames = hitlag
+			
+			
+			
+			
+			if hitlagFrames > 0 and not hitlagVelSet then
+				hitlagVel.x = actor:GetVelocity().x
+				hitlagVel.y = actor:GetVelocity().y
+				actor:SetVelocity( 0, 0 )
+				hitlagVelSet = true
+			end
 		end
+		
+		
 end
  
 --actor.health is inefficient and should only be updated/accessed once per frame
@@ -3058,6 +3116,8 @@ function HitByActor( otherActor, hitboxName, damage, hitlag, xhitstun, hurtboxTa
         end
         local hitSuccessful = false
         hitlagFrames = hitlag
+		
+		
         SetAction( hitstun )
 		
 		actor:SetSpriteOffset( 0, 0, 0 )

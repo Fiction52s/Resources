@@ -265,7 +265,7 @@ function Message( sender, msg, tag )
 		slowFactor = tag
 	elseif msg == "delta_x" then
 		deltax = tag
-		print( "deltax" )
+		--print( "deltax" )
 	elseif msg == "delta_y" then
 		deltay = tag
 	elseif msg == "frames_to_switch" then
