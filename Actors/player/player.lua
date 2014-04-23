@@ -1,6 +1,9 @@
 function SpriteCount()
 	--return 1
-	return trailCount + 1
+	return 2
+	
+	--player is first
+	--2nd is used for the combo fire
 end
 
 function BodyType()
@@ -341,17 +344,21 @@ function Init()
 		--for i = 1, 15 do
 			groundComboAttack1[i] = {harrison3hitSet, ( i - 1 ) }
         end
+		gca1CancelFrame = 18
 		
 		groundComboAttack2 = {}
         --for i = 1, 25 do
 		for i = 1, 15 * 2 do
 			groundComboAttack2[i] = {harrison3hitSet, (i-1) / 2 + 16}
         end
+		groundComboAttack2Buffered = false
+		gca2CancelFrame = 30
 		
 		groundComboAttack3 = {}
         for i = 1, 12 * 2 do
 			groundComboAttack3[i] = {harrison3hitSet,(i-1) / 2 + 30 }
         end
+		groundComboAttack3Buffered = false
 		
 		downGroundAttack = {}
 		for i = 1, 10 do
@@ -491,25 +498,6 @@ function Init()
 		
 		
 		--this whole section is just for the motion trail. if i dont need it i can remove this and any related variables.
-		pastaction = {}
-		pastframe = {}
-		pastpos = {}
-		pastangle = {}
-		for i = 1, trailCount do
-			actor:SetSpriteEnabled( i, true )
-			actor:SetSpriteOffset( i, i * 1, 0 )
-			pastpos[i] = ACTOR:b2Vec2()
-			pastpos[i].x = actor:GetPosition().x
-			pastpos[i].y = actor:GetPosition().y
-			pastangle[i] = 0
-			
-			--pastpos[i+1]
-			pastaction[i] = stand
-			pastframe[i] = 1
-			actor:SetSprite( i, stand[1][1],  stand[1][2] )
-			--actor:SetColor( i, 255, 255, 255, 255 / (i + 1) )
-		end
-        motionTrailOn = false
 end
  
 function GetAttackType( i )
@@ -752,6 +740,8 @@ function ChooseAction()
 					SetAction( downGroundAttack )
 				else
 					SetAction( groundComboAttack1 )
+					groundComboAttack2Buffered = false
+					groundComboAttack3Buffered = false
 				end
 				frame = 1
 			elseif action == dash then
@@ -765,9 +755,17 @@ function ChooseAction()
         end
 		
 		
+		if action == groundComboAttack1 and frame == gca1CancelFrame and groundComboAttack2Buffered then
+			SetAction( groundComboAttack2 )
+			frame = 1
+		end
 		
+		if action == groundComboAttack2 and frame == gca2CancelFrame and groundComboAttack3Buffered then
+			SetAction( groundComboAttack3 )
+			frame = 1
+		end
 		
-		if not actionChanged and currentInput.X and not prevInput.X and grounded then
+		--[[if not actionChanged and currentInput.X and not prevInput.X and grounded then
 			if action == groundComboAttack1 and frame > 8 then
 				if not currentInput:Right() and not currentInput:Left() then
 					if currentInput:Up() then 
@@ -819,7 +817,7 @@ function ChooseAction()
 					frame = 1
 				end
 			end
-		end
+		end--]]
        
         if not actionChanged and currentInput.X and not prevInput.X and (action == jump or action == doubleJump or ( action == wallJump --[[and frame > 4--]] ) ) then
 				airControlLock = 10 - frame
@@ -1165,11 +1163,12 @@ function HandleAction()
 		
 		
 		if action == groundComboAttack1 or action == groundComboAttack2 or action == groundComboAttack3 then
+			actor:SetSpriteOffset( 0, 1.5, -.4 )
 			if actor:IsFacingRight() then
-				actor:SetSpriteOffset( 0, 1.5, -.4 )
+				--actor:SetSpriteOffset( 0, 1.5, -.4 )
 				--actor:SetSpriteOffset( 0, math.cos( angle ) * 1.3 + math.sin( angle ) * -.3, math.sin( angle ) * 1.3 + math.cos( angle ) * -.6 )
 			else
-				actor:SetSpriteOffset( 0, -1.5, -.4 )
+				--actor:SetSpriteOffset( 0, -1.5, -.4 )
 				--actor:SetSpriteOffset( 0, math.cos( angle ) * -1.3 + math.sin( angle ) * -.3, math.sin( angle ) * -1.3 + math.cos( angle ) * -.6 )
 			end
 		end
@@ -1301,7 +1300,7 @@ function HandleAction()
                 end
         end
 		
-		motionTrailOn = false
+		
 		
         if action == stand then
                 actor:SetVelocity( 0, 0 )
@@ -1390,10 +1389,6 @@ function HandleAction()
                         end
                 end
         elseif action == airDash then
-			
-			if frame > 3 then
-				motionTrailOn = true
-			end
 			
 			if frame == 1 then
 				
@@ -1506,6 +1501,41 @@ function HandleAction()
 						actor:CreateBox( hitboxTypes.Slash, Layer_PlayerHitbox, -.5, -.75 + yOffset, .5, .5, 0 )
 						actor:CreateBox( hitboxTypes.Slash, Layer_PlayerHitbox, -.5,  .75 + yOffset, .5, .5, 0 )
                 end
+			end
+			
+			if frame % 5 == 0 and frame > 0 then--and not (touchingLeftWall or touchingRightWall) then
+				local rpos = ACTOR:b2Vec2()
+				--local tempA = math.atan2( groundNormal.x, -groundNormal.y )
+				
+				local xmove = 0
+				local ymove = 0
+				rpos.x = actor:GetPosition().x
+				
+				if actor:IsFacingRight() then
+					rpos.x = rpos.x - .5
+				else
+					rpos.x = rpos.x + .5
+				end
+				
+				rpos.y = actor:GetPosition().y
+				if actor:IsReversed() then
+					rpos.y = rpos.y - .5
+				else
+					rpos.y = rpos.y + .5
+				end
+				
+				local vel = ACTOR:b2Vec2()
+				vel.x = 0
+				vel.y = 0
+				stage:CreateActor( "airdashdustrepeat", rpos, vel, actor:IsFacingRight(), actor:IsReversed(), 0, actor )
+				--rpos.y = rpos.y - .5
+				if actor:IsFacingRight() then
+					rpos.x = rpos.x + 1.5
+				else
+					rpos.x = rpos.x - 1.5
+				end
+				--stage:CreateActor( "airdashdustrepeat", rpos, vel, actor:IsFacingRight(), actor:IsReversed(), 0, actor )
+				
 			end
 			--end
 			
@@ -1897,9 +1927,9 @@ function HandleAction()
         
 		if action == runningAttack then
 			if actor:IsFacingRight() then
-				actor:SetSpriteOffset( 0, math.cos( angle ) * 1, math.sin( angle ) * 1 )
+				actor:SetSpriteOffset( 0, 1, 1 )
 			else
-				actor:SetSpriteOffset( 0, math.cos( angle ) * -1, math.sin( angle ) * -1 )
+				actor:SetSpriteOffset( 0, -1, -1 )
 			end
 			
 		end
@@ -2046,6 +2076,14 @@ function HandleAction()
                 else
                         actor:CreateBox( hitboxTypes.Slash, Layer_PlayerHitbox, -xOffset * c - yOffset * s, -xOffset * s + yOffset * c, 1.5, 1, a )
                 end
+				
+				if frame > 1 and currentInput.X and not prevInput.X then
+					if groundComboAttack2Buffered then
+						groundComboAttack3Buffered = true
+					else
+						groundComboAttack2Buffered = true
+					end
+				end
 		elseif action == groundComboAttack2 then--and frame > 5 and frame < 15 then
 				--actor:ClearHitboxes()
 				if frame == 1 then
@@ -2053,6 +2091,12 @@ function HandleAction()
 					if not actor:IsFacingRight() then
 						xso = -xso
 					end
+					
+			
+					
+					
+					
+					
 					--actor:SetSpriteOffset( 0, xso, -1.2 )
 					--actor:SetSpriteScale( 0, 1.3, 1.3 )
 				end
@@ -2066,6 +2110,12 @@ function HandleAction()
                 else
                         actor:CreateBox( hitboxTypes.Slash, Layer_PlayerHitbox, -xOffset * c - yOffset * s, -xOffset * s + yOffset * c, 1.5, 3, a )
                 end
+				
+				if frame > 1 and currentInput.X and not prevInput.X and not groundComboAttack3Buffered then
+					groundComboAttack3Buffered = true
+				end
+				
+				
 		elseif action == groundComboAttack3 then--and frame > 5 and frame < 15 then
 				--actor:ClearHitboxes()
 				if frame == 1 then
@@ -2221,30 +2271,7 @@ function HandleAction()
        
 	   
 	  --  if action == run or action == dash or action == jump or action == doubleJump then
-			if math.abs(actor:GetVelocity().x) >=14 then
-				motionTrailOn = true
-				
-			end
-		--end
-		if action == fastFall then
-			motionTrailOn = true
-			
-			if frame == 1 then
-			for i = 1, trailCount do
-				pastaction[i] = action
-				pastpos[i].x = actor:GetPosition().x
-				pastpos[i].y = actor:GetPosition().y
-				pastangle[i] = 0
-				pastframe[i] = frame
-			end
-			end
-		end
 		
-		
-		
-		if actor:GetVelocity().y >= 40 then
-			motionTrailOn = true
-		end
 		--print( "before carry: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
 		
 		--print( "after carry: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
@@ -2796,50 +2823,9 @@ function UpdatePrePhysics()
 		
 		
 		--motion trail stuff
-		for i = trailCount-1, 1, -1 do
-			pastaction[i+1] = pastaction[i]
-			pastframe[i+1] = pastframe[i]
-			pastpos[i+1].x = pastpos[i].x
-			pastpos[i+1].y = pastpos[i].y
-			pastangle[i+1] = pastangle[i]
-			
-		end
-		
-		pastaction[1] = action
-		pastframe[1] = frame
-		
-		--if motionTrailOn then
-		if false then
-			
-			local ox  = actor:GetSpriteOffset( 0 ).x
-			local oy = actor:GetSpriteOffset( 0 ).y
-			local dir = ACTOR:b2Vec2()
-			
-			
-			for i = 1, trailCount do
-				dir.x = pastpos[i].x - actor:GetPosition().x
-				dir.y = pastpos[i].y - actor:GetPosition().y 
-				dir:Normalize()
-			
-				--actor:SetColor( i, 255, 255, 255, 255 / (i + 1) )
-				actor:SetColor( i, 255, 255, 255, 50 )
-				actor:SetSpriteEnabled( i, true )
-				actor:SetSprite( i, pastaction[i][pastframe[i]][1],  pastaction[i][pastframe[i]][2] )
-				actor:SetSpriteOffset( i, (pastpos[i].x - actor:GetPosition().x) / 5 + ox, (pastpos[i].y - actor:GetPosition().y) / 5 + oy )
-				--actor:SetSpriteOffset( i, dir.x * i * .08 + ox, dir.y * i * .08 + oy )
-				--actor:SetSpriteOffset( i, .1 * i + ox, oy )
-				actor:SetSpriteAngle( i, pastangle[i] )
-			end
-		else
-			for i = 1, trailCount do
-				actor:SetSpriteEnabled( i, false )
-			end
-		end
 		
 		
-		pastangle[1] = angle / math.pi
-		pastpos[1].x = actor:GetPosition().x
-		pastpos[1].y = actor:GetPosition().y
+		
 		
 		--end motion trail stuff
 		
@@ -2869,7 +2855,7 @@ function UpdatePrePhysics()
 --	  print( "sprite offset: " .. actor:GetSpriteOffset(0).x ..", " .. actor:GetSpriteOffset(0).y )
 
 
-	  print( "pos: " .. actor:GetPosition().x .. ", " .. actor:GetPosition().y )
+	 -- print( "pos: " .. actor:GetPosition().x .. ", " .. actor:GetPosition().y )
         --print( "special: " .. specialVel.x .. ", " .. specialVel.y )
        
         prevPosition.x = actor:GetPosition().x
@@ -3668,4 +3654,4 @@ function Sword( xOffset, yOffset, xSize, ySize )
 	end
 end
 
-trailCount = 60
+trailCount = 0

@@ -97,6 +97,7 @@ function Init()
 	SetAction( exist )
 	
 	actor:SetSpriteEnabled( 0, true )
+	actor:SetSpritePriority( 0, -3 )
 	
 	rightWall = false
 	leftWall = false
