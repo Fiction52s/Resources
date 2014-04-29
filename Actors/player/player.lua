@@ -1,6 +1,6 @@
 function SpriteCount()
 	--return 1
-	return 2
+	return 1
 	
 	--player is first
 	--2nd is used for the combo fire

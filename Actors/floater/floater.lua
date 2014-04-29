@@ -99,6 +99,9 @@ function Init()
 	actor:SetSpriteEnabled( 0, true )
 	actor:SetSpritePriority( 0, -3 )
 	
+	actor:SetSpriteAngle( 0, actor:GetBodyAngle() )
+	actor:SetSprite( 0, action[frame][1], action[frame][2] )
+	
 	rightWall = false
 	leftWall = false
 	ceiling = false
