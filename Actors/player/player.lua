@@ -118,10 +118,10 @@ function Init()
         touchingRightWall = false
         touchingLeftWall = false
         wallThreshold = .9
-        maxFallVelocity = 40 --considering raising this because it looks weird at fast horizontal speeds
+        maxFallVelocity = 60--84--40 --considering raising this because it looks weird at fast horizontal speeds
         maxVelocity = ACTOR:b2Vec2()
-        maxVelocity.x = 84--40
-        maxVelocity.y = 84
+        maxVelocity.x = 60--84--40
+        maxVelocity.y = 60--84
         prevPosition = ACTOR:b2Vec2()
         prevPosition.x = actor:GetPosition().x
         prevPosition.y = actor:GetPosition().y
@@ -1313,7 +1313,8 @@ function HandleAction()
 						
                         canInterruptJump = true
                         if actor:GetVelocity().y < 0 then
-                                if math.abs( actor:GetVelocity().x ) > maxVelocity.x - 10 then
+								if true then
+                                --if math.abs( actor:GetVelocity().x ) > maxVelocity.x - 10 then
                                         actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y * 1 - jumpStrength )
                                         --print( "fffffffffffff" )
                                 else
@@ -2491,7 +2492,7 @@ function UpdatePrePhysics()
 
 		else
 			--grav = 2
-			maxFallVelocity = 40
+			maxFallVelocity = 60--84--40
 		end
 		  
 		--print( "rccount: " .. rcCount )
@@ -2851,7 +2852,7 @@ function UpdatePrePhysics()
         --print( "pos: " .. actor:GetPosition().x .. ", " .. actor:GetPosition().y )
         --print( "frame: " .. frame )
 	   --print( "gnorm: " .. groundNormal.x .. ", " .. groundNormal.y )
-    --  print( "vel1: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+      print( "vel1: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
 --	  print( "sprite offset: " .. actor:GetSpriteOffset(0).x ..", " .. actor:GetSpriteOffset(0).y )
 
 
