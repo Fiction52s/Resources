@@ -392,6 +392,12 @@ function Init()
 		for i = 1, 16 do
 			upAirAttack[i] = {uairSet, (i-1)}
         end
+		for i = 17, 40 do
+			upAirAttack[i] = {jumpSet, 3}
+		end
+		
+		
+		
 		
 		downAirAttack = {}
 		--for i = 1, 44 do
@@ -400,8 +406,8 @@ function Init()
 		for i = 1, 8 do
 			downAirAttack[i] = {dairSet, (i-1) }
 		end
-		for i = 1, 13*2 do
-			downAirAttack[i+8] = {dairSet, (i-1)/2 + 8 }
+		for i = 1, 13*1 do
+			downAirAttack[i+8] = {dairSet, (i-1)/1 + 8 }
 		end
 		--for i = 1, 8 do
 		--	downAirAttack[i] = {dairSet, (i-1) }
@@ -1315,7 +1321,7 @@ function HandleAction()
                         if actor:GetVelocity().y < 0 then
 								if true then
                                 --if math.abs( actor:GetVelocity().x ) > maxVelocity.x - 10 then
-                                        actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y * 1 - jumpStrength )
+                                        actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y * .8 - jumpStrength )
                                         --print( "fffffffffffff" )
                                 else
                                         --actor:SetVelocity( actor:GetVelocity().x, - jumpStrength )
@@ -1392,22 +1398,24 @@ function HandleAction()
         elseif action == airDash then
 			
 			if frame == 1 then
+
+			
+				local pos = ACTOR:b2Vec2()
 				
-			
-			
 			
 				local vel = ACTOR:b2Vec2()
 				vel.x = 0
 				vel.y = 0
 				
 				pos.x = actor:GetPosition().x
+
 				if actor:IsReversed() then
 					pos.y = actor:GetPosition().y - 0
 				else
 					pos.y = actor:GetPosition().y + 0
 				end
-				
-				stage:CreateActor( "dashdust", pos, vel, actor:IsFacingRight(), actor:IsReversed(), angle/ math.pi, actor )
+
+				--stage:CreateActor( "airdashdust", pos, vel, actor:IsFacingRight(), actor:IsReversed(), angle/ math.pi, actor )
 			end
 		
 		
@@ -1504,7 +1512,7 @@ function HandleAction()
                 end
 			end
 			
-			if frame % 5 == 0 and frame > 0 then--and not (touchingLeftWall or touchingRightWall) then
+			if frame % 5 == 0 or frame == 1 then--and not (touchingLeftWall or touchingRightWall) then
 				local rpos = ACTOR:b2Vec2()
 				--local tempA = math.atan2( groundNormal.x, -groundNormal.y )
 				
@@ -1545,6 +1553,7 @@ function HandleAction()
 			--else
 				
 			--end
+			print( "frame 1 airdash end" )
         elseif action == bounceJump and frame == 1 then
                 actor:SetVelocity( actor:GetVelocity().x, -bounceJumpStrength )
         else
@@ -2190,8 +2199,14 @@ function HandleAction()
                 else
                         actor:CreateBox( hitboxTypes.Slash, Layer_PlayerHitbox, -xOffset * c - yOffset * s, -xOffset * s + yOffset * c, 1, 1, a )
                 end
-        elseif action == forwardAirAttack and frame >= 4 and frame < 19 then
+        elseif action == forwardAirAttack then
                 --forwardAirAttack info
+				
+				if frame == 1 and actor:GetVelocity().y < 20 and not currentInput.A then
+					--actor:SetVelocity( actor:GetVelocity().x, -10 )
+				end
+				
+				--and frame >= 4 and frame < 19 then
 				if frame >=4 and frame <= 5 then
 					Sword( -.75,-.5, .5, .6 )
 					
@@ -2214,8 +2229,12 @@ function HandleAction()
 				end
 				--Sword( 1.25, 0, 2, 3 )
                 
-		elseif action == upAirAttack and frame >= 4 and frame <= 12 then
+		elseif action == upAirAttack then
                 --forwardAirAttack info
+				if frame == 1 and actor:GetVelocity().y < 20 and not currentInput.A and math.abs( actor:GetVelocity().x ) <= 30 then
+					actor:SetVelocity( actor:GetVelocity().x, -10 )
+				end
+				--and frame >= 4 and frame <= 12 
 				if frame == 4 then
 					Sword( -1, -.3, 1, 1.4 )
 				elseif frame == 5 then
@@ -2236,8 +2255,13 @@ function HandleAction()
 				elseif frame == 12 then
 					Sword( .5, 0, 1, .5 )
                 end
-		elseif action == downAirAttack and frame >= 4 and frame < 19 then
+		elseif action == downAirAttack then
 				print( "down: " .. frame )
+				
+				--and frame >= 4 and frame < 13 then
+				if frame == 1 and actor:GetVelocity().y < 20 and not currentInput.A and math.abs( actor:GetVelocity().x ) <= 30 then
+					actor:SetVelocity( actor:GetVelocity().x, -10 )
+				end
                 --forwardAirAttack info
                 local xOffset = 1.25
 
@@ -2852,7 +2876,11 @@ function UpdatePrePhysics()
         --print( "pos: " .. actor:GetPosition().x .. ", " .. actor:GetPosition().y )
         --print( "frame: " .. frame )
 	   --print( "gnorm: " .. groundNormal.x .. ", " .. groundNormal.y )
-      print( "vel1: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+	   
+	   
+      --print( "vel1: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+	  
+	  
 --	  print( "sprite offset: " .. actor:GetSpriteOffset(0).x ..", " .. actor:GetSpriteOffset(0).y )
 
 
