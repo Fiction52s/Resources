@@ -467,8 +467,8 @@ function Init()
 			hitstun[i] = {doubleJumpSet, 2 }
         end
         --contact types--
-        bodyTypes = {Normal = 1}
-        bodyStrings = {"Normal"}
+        bodyTypes = {Normal = 1, Ball = 2}
+        bodyStrings = {"Normal", "Ball"}
         hitboxTypes = {Heal = 1, Slash = 2}
         hitboxStrings = {"Heal", "Slash"}
        
@@ -487,6 +487,8 @@ function Init()
         actor:CreateBox( bodyTypes.Normal, Layer_PlayerHurtbox, 0, 0, .5, 1.5, 0 )
        
         actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, 0, .5, 1.5, 0 )
+		
+		actor:CreateCircle( bodyTypes.Ball, Layer_PlayerHurtbox, 0, -.75, 1.5 )
        
         actor:CreateBox( bodyTypes.Normal, Layer_PlayerEventCollision, 0, 0, .5, 1.5, 0 )
         actor:SetFriction( 0 )
