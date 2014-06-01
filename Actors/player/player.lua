@@ -502,6 +502,10 @@ function Init()
 		
 		actor:SetSpriteEnabled( 0, true )
 		
+		tethered = false
+		
+		leftTetherThing = false
+		rightTetherThing = false
 		
 		--this whole section is just for the motion trail. if i dont need it i can remove this and any related variables.
 end
@@ -618,9 +622,136 @@ function ChooseAction()
 		
 
         if action == hitstun then
-                actionChanged = true
+            actionChanged = true
         end
 		
+		if (currentInput.rightTrigger > 10 and prevInput.rightTrigger < 10)
+			or (currentInput.leftTrigger > 10 and prevInput.leftTrigger < 10) then
+			
+			
+			print( "in here" )
+			local vel = ACTOR:b2Vec2()
+			vel.x = 0
+			vel.y = 0
+			if currentInput:Left() then
+				vel.x = vel.x - 1
+			elseif currentInput:Right() then
+				vel.x = vel.x + 1
+			end
+			
+			if currentInput:Up() then
+				vel.y = vel.y - 1
+			elseif currentInput:Down() then
+				vel.y = vel.y + 1
+			end
+			
+			if vel.x == 0 and vel.y == 0 then
+				if actor:IsFacingRight() then
+					vel.x = vel.x + 1
+				else
+					vel.x = vel.x - 1
+				end
+			end
+			
+			vel:Normalize()
+			
+			vel.x = vel.x * 40
+			vel.y = vel.y * 40
+			
+			--print( "tether shot" )
+			
+			local leftState = player:GetTetherState( true )
+			local rightState = player:GetTetherState( false )
+			
+			if currentInput.leftTrigger > 10 then
+				if leftState == "dormant" then
+					player:TetherShot( vel.x, vel.y, true )
+					print( "tether shot" )
+				elseif leftState == "shot" then
+					--do nothing for now
+				elseif leftState == "locked" then
+				--	player:ReleaseTether( true )
+			--		print( "release tether" )
+				elseif leftState == "anchored" then
+					player:LockTether( true )
+					print( "lock tether" )
+				end
+			end
+			
+			if currentInput.rightTrigger > 10 then
+				print( "blah blah" )
+				if rightState == "dormant" then
+					player:TetherShot( vel.x, vel.y, false )
+					print( "tether shot" )
+				elseif rightState == "shot" then
+					--do nothing for now
+				elseif rightState == "locked" then
+				--	player:ReleaseTether( true )
+			--		print( "release tether" )
+				elseif rightState == "anchored" then
+					player:LockTether( false )
+					print( "lock tether" )
+				end
+				
+				print( "made it to the end" )
+				--[[if player:RightTetherActive() then
+					if rightTetherThing then
+						player:ReleaseTether( false )
+					else
+						player:MaxTetherLength( true )
+						rightTetherThing = true
+					end
+					print( "right tether released" )
+				else
+					player:TetherShot( vel.x, vel.y, false )
+					rightTetherThing = false
+				end--]]
+				
+			end
+			
+		--	print( "After tether shot" )
+			--if not tethered then
+				--tethered = true
+			
+				--[[local posX = actor:GetPosition().x
+				local posY = actor:GetPosition().y
+				
+				posY = posY - 10
+				if actor:IsFacingRight() then
+					posX = posX + 10
+				else
+					posX = posX - 10
+				end
+				
+				player:CreateTether( posX, posY, 10)
+				SetAction( jump )
+				frame = 3
+				print( "create tether" )--]]
+			--else
+			--	tethered = false
+				--player:ReleaseTether()
+				--print( "release tether" )
+			--end
+		elseif (currentInput.rightTrigger < 10 and prevInput.rightTrigger > 10)
+			or (currentInput.leftTrigger < 10 and prevInput.leftTrigger > 10) then
+			local leftState = player:GetTetherState( true )
+			local rightState = player:GetTetherState( false )
+			
+			if currentInput.leftTrigger < 10 and prevInput.leftTrigger > 10 then
+				if leftState == "locked" then
+					player:ReleaseTether( true )
+				end
+			end
+			
+			if currentInput.rightTrigger < 10 and prevInput.rightTrigger > 10 then
+				
+				if rightState == "locked" then
+					--print( "Releasing right tether" )
+					player:ReleaseTether( false )
+					--print( "done releasing" )
+				end
+			end
+		end
 		
 		
 		if action == tetherPull then
@@ -682,6 +813,7 @@ function ChooseAction()
 		tetherArrived = false
 		
 		
+		if false then
         if not stage.cloneWorld and action ~= tetherPull and not actionChanged and currentInput.Y and not prevInput.Y and 
 		(action == wallJump or action == wallCling or action == stand or action == dashToStand or action == dash or action == run 
 		or action == standToRun or (action == forwardAirAttack and frame > 7 ) or (action == downAirAttack and frame > 7 )
@@ -736,6 +868,8 @@ function ChooseAction()
                 --SetAction( timeWave )
                 --frame = 1
         end
+		
+		end
 		
        
         if not actionChanged and currentInput.X and not prevInput.X and grounded then
