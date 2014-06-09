@@ -507,6 +507,12 @@ function Init()
 		leftTetherThing = false
 		rightTetherThing = false
 		
+		lastRadians = 0
+		
+		leftTetherGrown = false
+		rightTetherGo = false
+		rightStickDirTimerMax = 90
+		rightStickDirTimer = 0
 		--this whole section is just for the motion trail. if i dont need it i can remove this and any related variables.
 end
  
@@ -625,11 +631,196 @@ function ChooseAction()
             actionChanged = true
         end
 		
-		if (currentInput.rightTrigger > 10 and prevInput.rightTrigger < 10)
-			or (currentInput.leftTrigger > 10 and prevInput.leftTrigger < 10) then
+		local leftState = player:GetTetherState( true )
+		local rightState = player:GetTetherState( false )
+		
+		
+		if currentInput.leftStickMagnitude > .5 and rightStickDirTimer == 0 then
+			lastRadians = currentInput.leftStickRadians + math.pi / 2
+			player:SetStoredRadians( lastRadians )
+		end
+		
+		if currentInput.rightStickMagnitude > .8 and (rightState == "dormant" or leftState == "dormant") then
+			rightStickDirTimer = rightStickDirTimerMax
+			player:SetTetherAim( true )
+			print( "on" )
+			lastRadians = currentInput.rightStickRadians + math.pi / 2
+			player:SetStoredRadians( lastRadians )
+		end
+		
+		if rightStickDirTimer > 0 then
+			rightStickDirTimer = rightStickDirTimer - 1
+		else
+			player:SetTetherAim( false )
+			print( "off" )
+		end
+		
+		
+		
+		if currentInput.rightShoulder and rightState == "locked" then
+		--	player:ShrinkTether( .5, false )
+		elseif currentInput.leftShoulder and leftState == "locked" then
+		--	player:ShrinkTether( .5, true )
+		end
+		
+		
+		leftTetherGrown = false
+		
+		local triggerThresh = 100
+		
+		if currentInput.rightTrigger > triggerThresh and prevInput.rightTrigger <= triggerThresh
+			or currentInput.leftTrigger > triggerThresh and prevInput.leftTrigger <= triggerThresh 
+		or currentInput.rightShoulder and not prevInput.rightShoulder or currentInput.leftShoulder and not prevInput.leftShoulder then
 			
 			
-			print( "in here" )
+			
+			if currentInput.leftTrigger > triggerThresh or currentInput.leftShoulder then
+				if leftState == "dormant" then
+					local vel = ACTOR:b2Vec2()
+					local shotSpeed = 70
+					vel.x = math.sin( lastRadians ) * shotSpeed
+					vel.y = math.cos( lastRadians ) * shotSpeed
+					print( "left shot" )
+					player:TetherShot( shotSpeed, true )
+					
+					if rightState == "locked" and currentInput.rightTrigger > triggerThresh then
+					--	player:ReleaseTether( false )
+					end
+				elseif leftState == "locked" then
+				--	player:ReleaseTether( true )
+					print( "this release left" )
+				end
+			end
+			
+			if currentInput.rightTrigger > triggerThresh or currentInput.rightShoulder then
+				if rightState == "dormant" then
+					local vel = ACTOR:b2Vec2()
+					local shotSpeed = 70
+					vel.x = math.sin( lastRadians ) * shotSpeed
+					vel.y = math.cos( lastRadians ) * shotSpeed
+					player:TetherShot( shotSpeed, false )
+					
+					--local test = lastRadians / math.pi * 180
+					--test = math.floor( test + .5 )
+					--print( "shooting right tether with radians: " .. test )
+					if leftState == "locked" and currentInput.leftTrigger > triggerThresh then
+					--	player:ReleaseTether( true )
+					end
+				elseif rightState == "locked" then
+					print( "this release right" )
+					--player:ReleaseTether( false )
+					rightTetherGo = false
+				end
+			end
+			
+			
+		end
+		
+		if not currentInput.rightShoulder and rightState == "locked" then
+			--player:ReleaseTether( false )
+		end
+		
+		if not currentInput.leftShoulder and leftState == "locked" then
+			--player:ReleaseTether( true )
+		end
+		
+		if currentInput.rightTrigger <= triggerThresh and rightState == "locked" then
+			player:ReleaseTether( false )
+			print( "right release 2" )
+		end
+		
+		if currentInput.leftTrigger <= triggerThresh and leftState == "locked" then
+			player:ReleaseTether( true )
+			print( "left release 2" )
+		end
+		
+		
+		
+		
+		--if currentInput.rightShoulder or currentInput.leftShoulder then
+		if (currentInput.rightTrigger > triggerThresh or currentInput.leftTrigger > triggerThresh) then
+			
+			local leftState = player:GetTetherState( true )
+			local rightState = player:GetTetherState( false )
+			
+			if currentInput.rightTrigger > triggerThresh and rightState == "anchored" then
+				player:LockTether( false )
+			end
+			
+			if currentInput.leftTrigger > triggerThresh and leftState == "anchored" then
+				player:LockTether( true )
+			end
+			
+			if rightState == "locked" and currentInput.rightTrigger > triggerThresh then
+			--if rightState == "locked" and currentInput.rightTrigger > triggerThresh then
+			
+				if currentInput.Y then
+					player:GrowTether( .5, false )
+				else
+					--print( "in this thing" )
+					player:LockTether( false )
+					--player:ShrinkTether( .5, false )
+					
+					
+					--actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y )
+					--rightTetherGo = true
+					
+					
+					if leftState == "locked" and currentInput.leftTrigger > triggerThresh then
+						player:ShrinkTether( .25, false )
+						player:ShrinkTether( .25, true )
+						--player:GrowTether( 1, true )
+						--leftTetherGrown = true
+					else
+						player:ShrinkTether( 1, false )
+					end
+					
+					print( "----" )
+				end
+				
+				
+			end
+			
+			if leftState == "locked" and currentInput.leftTrigger > triggerThresh then
+				--print( "blah left" )
+				if currentInput.Y then
+					player:GrowTether( .5, true )
+				else
+					player:LockTether( true )
+					
+					if currentInput.rightTrigger > triggerThresh and rightState == "locked" then
+						player:ShrinkTether( .25, true )
+						player:ShrinkTether( .25, false )
+					--	player:GrowTether( 1, false )
+					else
+						player:ShrinkTether( 1, true )
+					end
+				end
+				
+				--player:LockTether( false )
+				--player:LockTether( true )
+			end
+			
+			if leftState == "locked" then
+					
+			--		player:LockTether( true )
+			end
+			if rightState == "locked" then
+			--	player:LockTether( false )
+			end
+			
+			
+		end
+		
+		if rightTetherGo then
+			player:ShrinkTether( 2.5, false )
+		end
+		
+		if false and (currentInput.rightTrigger > 100 or currentInput.leftTrigger > 100) then
+			--or (currentInput.leftTrigger > 10 and prevInput.leftTrigger < 10) then
+			
+			
+			--print( "in here" )
 			local vel = ACTOR:b2Vec2()
 			vel.x = 0
 			vel.y = 0
@@ -663,7 +854,7 @@ function ChooseAction()
 			local leftState = player:GetTetherState( true )
 			local rightState = player:GetTetherState( false )
 			
-			if currentInput.leftTrigger > 10 then
+			if currentInput.leftTrigger > 255 then
 				if leftState == "dormant" then
 					player:TetherShot( vel.x, vel.y, true )
 					print( "tether shot" )
@@ -671,6 +862,7 @@ function ChooseAction()
 					--do nothing for now
 				elseif leftState == "locked" then
 				--	player:ReleaseTether( true )
+					player:GrowTether( .1, true )
 			--		print( "release tether" )
 				elseif leftState == "anchored" then
 					player:LockTether( true )
@@ -678,14 +870,24 @@ function ChooseAction()
 				end
 			end
 			
+			if not grounded or action == slide then
 			if currentInput.rightTrigger > 10 then
-				print( "blah blah" )
+				--print( "blah blah" )
 				if rightState == "dormant" then
 					player:TetherShot( vel.x, vel.y, false )
 					print( "tether shot" )
 				elseif rightState == "shot" then
 					--do nothing for now
 				elseif rightState == "locked" then
+					
+					
+					if currentInput.leftTrigger > 10 then
+						print( "shrink" )
+						player:ShrinkTether( .5, false )
+						print( "shrink over" )
+					else
+						player:GrowTether( .5, false )
+					end
 				--	player:ReleaseTether( true )
 			--		print( "release tether" )
 				elseif rightState == "anchored" then
@@ -693,7 +895,7 @@ function ChooseAction()
 					print( "lock tether" )
 				end
 				
-				print( "made it to the end" )
+				--print( "made it to the end" )
 				--[[if player:RightTetherActive() then
 					if rightTetherThing then
 						player:ReleaseTether( false )
@@ -707,6 +909,7 @@ function ChooseAction()
 					rightTetherThing = false
 				end--]]
 				
+			end
 			end
 			
 		--	print( "After tether shot" )
@@ -739,7 +942,7 @@ function ChooseAction()
 			
 			if currentInput.leftTrigger < 10 and prevInput.leftTrigger > 10 then
 				if leftState == "locked" then
-					player:ReleaseTether( true )
+				--	player:ReleaseTether( true )
 				end
 			end
 			
@@ -747,7 +950,7 @@ function ChooseAction()
 				
 				if rightState == "locked" then
 					--print( "Releasing right tether" )
-					player:ReleaseTether( false )
+				--	player:ReleaseTether( false )
 					--print( "done releasing" )
 				end
 			end
@@ -778,15 +981,15 @@ function ChooseAction()
 		
 		
 		if currentInput.leftShoulder and not prevInput.leftShoulder and not stage.cloneWorld then
-			stage.cloneWorldStart = true
+		--	stage.cloneWorldStart = true
 		end
 		
 		if currentInput.leftShoulder and not prevInput.leftShoulder and stage.cloneWorld then
-			stage.cloneWorldExtra = true
+		--	stage.cloneWorldExtra = true
 		end
 		
 		if currentInput:AltLeft() and not prevInput:AltLeft() and stage.cloneWorld then
-			stage.cloneWorldRevert = true
+		--	stage.cloneWorldRevert = true
 		end
 		
 		--if currentInput:AltRight() and not prevInput:AltRight() and stage.cloneWorld then
@@ -3064,6 +3267,14 @@ end
 function UpdatePostPhysics()
 		
 		--actor:SetVelocity( actor:GetVelocity().x - carryVel.x, actor:GetVelocity().y - carryVel.y )
+		local leftState = player:GetTetherState( true )
+		local rightState = player:GetTetherState( false )
+			
+		if leftState == "locked" and rightState == "locked" then
+			--leftTetherGrown = false
+			player:LockTether( true )
+			player:LockTether( false )
+		end
 		
 		actor:SetFriction( 0 )
 		if killed then
