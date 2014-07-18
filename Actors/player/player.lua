@@ -652,7 +652,7 @@ function ChooseAction()
 			rightStickDirTimer = rightStickDirTimer - 1
 		else
 			player:SetTetherAim( false )
-			print( "off" )
+		--	print( "off" )
 		end
 		
 		
@@ -1327,9 +1327,9 @@ function ChooseAction()
                 if currentInput.B and not prevInput.B and currentInput:Down() and not grounded and action ~= gravitySlash and action ~= fastFall then
 					if action == forwardAirAttack or action == upAirAttack or action == downAirAttack then
 						if actor:GetVelocity().y < 0 then
-							actor:SetVelocity( actor:GetVelocity().x * 2 / 3, fastFallBoost )
+							actor:SetVelocity( actor:GetVelocity().x * 3 / 3, fastFallBoost )
 						else
-							actor:SetVelocity( actor:GetVelocity().x * 2 / 3, actor:GetVelocity().y + fastFallBoost )
+							actor:SetVelocity( actor:GetVelocity().x * 3 / 3, actor:GetVelocity().y + fastFallBoost )
 						end
 						actionChanged = true
 					else
@@ -2273,10 +2273,11 @@ function HandleAction()
         end
         
 		if action == runningAttack then
+			actor:SetSpriteOffset( 0, 1, 0 )
 			if actor:IsFacingRight() then
-				actor:SetSpriteOffset( 0, 1, 1 )
+				--actor:SetSpriteOffset( 0, 1, 1 )
 			else
-				actor:SetSpriteOffset( 0, -1, -1 )
+				--actor:SetSpriteOffset( 0, -1, -1 )
 			end
 			
 		end
@@ -2729,10 +2730,12 @@ function UpdatePrePhysics()
 		
 		
 	   
-        local dist = .9 --1
+        local dist = .8 --1
         --probably should use some algorithm here
         if math.abs( actor:GetVelocity().x ) > 40 then
                 dist = 1.5
+		--else
+		--	dist = .9
         end
         rcCount = 0
        
@@ -3395,7 +3398,7 @@ end
 function SetAction( newAction )
         if action ~= nil then
                 CancelAction()
-				actor:SetSpriteOffset( 0, 0, -.05 )
+				actor:SetSpriteOffset( 0, 0, -.02 )
 				actor:SetSpriteScale( 0, 1, 1 )
         end
         if action ~= newAction and newAction ~= nil then

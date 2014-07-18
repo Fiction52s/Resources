@@ -73,6 +73,8 @@
  <tile id="35">
   <properties>
    <property name="chain" value="(0,64),(64,32)"/>
+   <property name="chain2" value="(64,32),(64,64)"/>
+   <property name="chain3" value="(0,64),(64,64)"/>
   </properties>
  </tile>
  <tile id="36">
@@ -185,6 +187,14 @@
    <property name="chain" value="(64,0),(64,64)"/>
   </properties>
  </tile>
+ <tile id="79">
+  <properties>
+   <property name="chain1" value="(0,0),(64,0)"/>
+   <property name="chain2" value="(64,0),(64,64)"/>
+   <property name="chain3" value="(0,0),(0,64)"/>
+   <property name="chain4" value="(0,64),(64,64)"/>
+  </properties>
+ </tile>
  <tile id="83">
   <properties>
    <property name="chain" value="(0,0),(0,64)"/>
@@ -210,11 +220,15 @@
  <tile id="88">
   <properties>
    <property name="chain" value="(0,0),(64,64)"/>
+   <property name="chain1" value="(0,0),(0,64)"/>
+   <property name="chain2" value="(0,64),(64,64)"/>
   </properties>
  </tile>
  <tile id="89">
   <properties>
    <property name="chain" value="(0,64),(64,0)"/>
+   <property name="chain2" value="(64,0),(64,64)"/>
+   <property name="chain3" value="(0,64),(64,64)"/>
   </properties>
  </tile>
  <tile id="90">

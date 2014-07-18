@@ -55,7 +55,7 @@ function HandleCollision( tileID, actor, tileVec, collisionVec, normalVec )
 		--	print( "NO ENABLE" )
 			--print( "not enabled" )
 			--dropThrough = true
-			
+			--enable = true
 			
 			--print( "f: " .. f )
 			--print( "platform" )
@@ -102,6 +102,7 @@ function HandleCollision( tileID, actor, tileVec, collisionVec, normalVec )
 	--if normalVec.y <= -.5 and actor:GetVelocity().y > 0 then
 	--	actor:GetVelocity().y = 0
 	--end
+	consumed = false
 	return consumed, enable
 end
 
