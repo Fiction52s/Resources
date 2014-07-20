@@ -2665,7 +2665,8 @@ end
  
 function UpdatePrePhysics()    
 		--print( "vel0: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
- 
+		player.dropThroughFlag = false
+		player.cancelDropFlag = false
 		
         if hitlagFrames > 0 then               
                 hitlagFrames = hitlagFrames - 1
@@ -2953,6 +2954,7 @@ function UpdatePrePhysics()
 		
 		if grounded then--or math.abs( actor:GetVelocity().x ) > math.abs( actor:GetVelocity().x - carryVel.x ) then
 		--actor:SetVelocity( actor:GetVelocity().x - carryVel.x, actor:GetVelocity().y )
+
 		actor:SetVelocity( actor:GetVelocity().x - carryVel.x, actor:GetVelocity().y )
 	    
 		end
@@ -3293,12 +3295,15 @@ function UpdatePostPhysics()
 			return
         end
 		
-		if dropThrough then
-			dropThrough = false
+		if not player.cancelDropFlag and player.dropThroughFlag and lastGrounded then
+			--player.dontDropThroughFlag = false
 			actor:SetSprite( 0, jump[3][1], jump[3][2] )
 			actor:SetSpriteOffset( 0, 0, 0 )
 			
+			trueGrounded = false
+			lastGrounded = false
 		end
+		player.cancelDropFlag = false
 		
        
     --   print( "vel2: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
@@ -3779,7 +3784,7 @@ function Message( sender, msg, tag )
         elseif msg == "air" then
 				--will force the player to not ground for a number of frames
 				forcedAirCounter = tag
-                --print( "air" )
+                
 				SetAction( jump )
 				actionChanged = false
                 frame = 3

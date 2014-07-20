@@ -4,10 +4,10 @@
  <properties>
   <property name="collide" value="black_collide"/>
  </properties>
- <image source="blacktiles.png" width="576" height="256"/>
+ <image source="blacktiles.png" width="576" height="320"/>
  <tile id="0">
   <properties>
-   <property name="chain" value="(0,0),(64,0)"/>
+   <property name="chain" value="(.01,0),(63.99,0)"/>
   </properties>
  </tile>
  <tile id="1">
@@ -134,6 +134,13 @@
    <property name="chain1" value="(0,0),(32,0)"/>
    <property name="chain2" value="(32,0),(64,64)"/>
    <property name="chain3" value="(0,64),(64,64)"/>
+  </properties>
+ </tile>
+ <tile id="39">
+  <properties>
+   <property name="chain" value="(10,64),(10,45)"/>
+   <property name="chain1" value="(10,45),(54,45)"/>
+   <property name="chain2" value="(54,45),(54,64)"/>
   </properties>
  </tile>
 </tileset>

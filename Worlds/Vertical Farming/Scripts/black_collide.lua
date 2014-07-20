@@ -4,23 +4,13 @@ function HandleCollision( tileID, actor, tileVec, collisionVec, normalVec )
 	local enable = true
 	local consumed = true
 	
-	--25-28
-	if tileID == 12 or tileID == 25 or tileID == 26 then
-		--local f = actor:Message( nil, "dropthroughleft", 0 )
-		--if f == 1 then
-		--	enable = false
-		--end
-	end
+	--print( "id: " .. tileID )
 	
-	if tileID == 13 or tileID == 27 or tileID == 28 then
-		--local f = actor:Message( nil, "dropthroughright", 0 )
-		--if f == 1 then
-		--	enable = false
-		--end
-	end
+	local enableDrop = true
 	
 	
-	if tileID == 12 then 
+	
+	if tileID == 0 then 
 		if actor:GetVelocity().y < 0 and actor:GetVelocity().x >= 0 then
 			--enable = false
 		end
@@ -34,7 +24,8 @@ function HandleCollision( tileID, actor, tileVec, collisionVec, normalVec )
 		end
 	end
 	--if tileID == 10 or tileID == 11 or tileID == 12 then
-	if tileID >= 38 and tileID <= 41 then--or tileID == 11 or tileID == 10 then
+	if tileID == 0 then--or tileID == 11 or tileID == 10 then
+		enableDrop = false
 		--test = actor:GetWorldBottom() - ( tileVec.y + fractionVec.y )
 		--print( "test: " .. actor:GetWorldBottom() .. ", " .. ( tileVec.y + fractionVec.y ) )
 		--if actor:GetVelocity().y <= 0 then
@@ -49,7 +40,7 @@ function HandleCollision( tileID, actor, tileVec, collisionVec, normalVec )
 		-- .02
 	--	enable = false
 		--print( tileID .. ": " .. tileVec.x .. ", " .. tileVec.y )
-		if actor:GetVelocity().y < 0 or actor:GetWorldBottom() - .02 > tileVec.y + 1 then
+		if actor:GetVelocity().y < 0 or actor:GetWorldBottom() - .02 > tileVec.y then
 		--if actor:GetWorldBottom()  >= tileVec.y + 1 then
 			enable = false
 		--	print( "NO ENABLE" )
@@ -62,8 +53,11 @@ function HandleCollision( tileID, actor, tileVec, collisionVec, normalVec )
 		else
 			local f = actor:Message( nil, "willdropthrough", 0 )
 			if f == 0 then
-				if actor:GetVelocity().y <= 2 and not solidGround then
-					actor:Message( nil, "dropthrough", 0 )
+				if actor:GetVelocity().y <= 2 then--and not solidGround then
+					--actor:Message( nil, "dropthrough", 0 )
+					
+					--enableDrop = true
+					stage.player.dropThroughFlag = true
 				end
 				enable = false
 				--dropThrough = true
@@ -79,12 +73,20 @@ function HandleCollision( tileID, actor, tileVec, collisionVec, normalVec )
 			--print( "missed" )
 		end
 	else
-		solidGround = true
+		--solidGround = true
+		
+		--if the other tiles that we are colliding with are solid ground and are ground tiles, not wall or ceiling, then dont disable the drop
+		--might need to modify for the sliding down the super slopes
+		if normalVec.y < -.5 then
+			stage.player.cancelDropFlag = true
+			--enableDrop = false
+		end
 		--print( "enable" )
 		--print( "fdfsfsdfsdfs: " .. tileID )
 	end
 	
-	if tileID == 105 or tileID == 91 or tileID == 104 or tileID == 118 then
+	--if tileID == 105 or tileID == 91 or tileID == 104 or tileID == 118 then
+	if tileID == 39 then
 		--print( "i hit the spikes")
 		if actor.type == stage.player.type then
 			--actor:Kill() --send message spike kill
@@ -102,6 +104,10 @@ function HandleCollision( tileID, actor, tileVec, collisionVec, normalVec )
 	--if normalVec.y <= -.5 and actor:GetVelocity().y > 0 then
 	--	actor:GetVelocity().y = 0
 	--end
+	if not enableDrop then
+	--	stage.player.dropThroughFlag = false
+	end
+	
 	consumed = false
 	return consumed, enable
 end
@@ -120,8 +126,8 @@ function HandleRayCast( tileID, actor, tileVec, collisionVec, normalVec )
 	
 	--for player only
 	if actor.type == stage.player.type then
-		if tileID >= 38 and tileID <= 41 then
-			if --[[actor:GetVelocity().y < 0 or --]] actor:GetWorldBottom() - .02 > tileVec.y + 1 or (actor:Message(nil, "willdropthrough", 0 ) == 0 and actor:GetVelocity().y > 2 ) then
+		if tileID == 0 then
+			if --[[actor:GetVelocity().y < 0 or --]] actor:GetWorldBottom() - .02 > tileVec.y or (actor:Message(nil, "willdropthrough", 0 ) == 0 and actor:GetVelocity().y > 2 ) then
 				--print( "vel: " .. actor:GetVelocity().y .. ", norm: " .. normalVec.y )
 				--print( "Result: " .. actor:GetVelocity().y * math.abs( normalVec.y ) )
 				return false
