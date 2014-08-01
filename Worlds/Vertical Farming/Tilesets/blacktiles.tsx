@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE tileset SYSTEM "http://mapeditor.org/dtd/1.0/map.dtd">
 <tileset name="blacktiles" tilewidth="64" tileheight="64">
  <properties>
   <property name="collide" value="black_collide"/>
@@ -136,11 +135,131 @@
    <property name="chain3" value="(0,64),(64,64)"/>
   </properties>
  </tile>
+ <tile id="18">
+  <properties>
+   <property name="chain" value="(32,64),(64,32)"/>
+  </properties>
+ </tile>
+ <tile id="19">
+  <properties>
+   <property name="chain" value="(0,32),(64,0)"/>
+  </properties>
+ </tile>
+ <tile id="20">
+  <properties>
+   <property name="chain" value="(0,0),(64,32)"/>
+  </properties>
+ </tile>
+ <tile id="21">
+  <properties>
+   <property name="chain" value="(0,32),(64,64)"/>
+  </properties>
+ </tile>
+ <tile id="23">
+  <properties>
+   <property name="chain" value="(32,0),(64,0)"/>
+   <property name="chain1" value="(64,0),(64,64)"/>
+   <property name="chain2" value="(32,64),(64,64)"/>
+   <property name="chain3" value="(32,0),(32,64)"/>
+  </properties>
+ </tile>
+ <tile id="24">
+  <properties>
+   <property name="chain" value="(0,0),(64,0)"/>
+   <property name="chain1" value="(0,0),(0,32)"/>
+   <property name="chain2" value="(0,32),(64,32)"/>
+   <property name="chain3" value="(64,0),(64,32)"/>
+  </properties>
+ </tile>
+ <tile id="25">
+  <properties>
+   <property name="chain" value="(0,0),(64,0)"/>
+   <property name="chain1" value="(0,0),(32,64)"/>
+   <property name="chain2" value="(32,64),(64,64)"/>
+   <property name="chain3" value="(64,0),(64,64)"/>
+  </properties>
+ </tile>
+ <tile id="26">
+  <properties>
+   <property name="chain" value="(0,0),(64,0)"/>
+   <property name="chain1" value="(0,0),(0,64)"/>
+   <property name="chain2" value="(0,64),(32,64)"/>
+   <property name="chain3" value="(32,64),(64,0)"/>
+  </properties>
+ </tile>
+ <tile id="28">
+  <properties>
+   <property name="chain" value="(0,64),(64,0)"/>
+  </properties>
+ </tile>
+ <tile id="29">
+  <properties>
+   <property name="chain" value="(0,0),(64,64)"/>
+  </properties>
+ </tile>
+ <tile id="32">
+  <properties>
+   <property name="chain" value="(0,32),(64,32)"/>
+   <property name="chain1" value="(64,32),(64,64)"/>
+   <property name="chain2" value="(0,64),(64,64)"/>
+   <property name="chain3" value="(0,32),(0,64)"/>
+  </properties>
+ </tile>
+ <tile id="33">
+  <properties>
+   <property name="chain" value="(0,0),(0,64)"/>
+   <property name="chain1" value="(0,64),(32,64)"/>
+   <property name="chain2" value="(0,0),(32,0)"/>
+   <property name="chain3" value="(32,0),(32,64)"/>
+  </properties>
+ </tile>
+ <tile id="34">
+  <properties>
+   <property name="chain" value="(32,0),(64,0)"/>
+   <property name="chain1" value="(64,0),(64,64)"/>
+   <property name="chain2" value="(32,0),(64,64)"/>
+  </properties>
+ </tile>
+ <tile id="35">
+  <properties>
+   <property name="chain" value="(0,0),(0,64)"/>
+   <property name="chain1" value="(0,0),(32,0)"/>
+   <property name="chain2" value="(0,64),(32,0)"/>
+  </properties>
+ </tile>
  <tile id="39">
   <properties>
    <property name="chain" value="(10,64),(10,45)"/>
    <property name="chain1" value="(10,45),(54,45)"/>
    <property name="chain2" value="(54,45),(54,64)"/>
+  </properties>
+ </tile>
+ <tile id="40">
+  <properties>
+   <property name="chain" value="(32,64),(64,32)"/>
+   <property name="chain1" value="(32,64),(64,64)"/>
+   <property name="chain2" value="(64,32),(64,64)"/>
+  </properties>
+ </tile>
+ <tile id="41">
+  <properties>
+   <property name="chain" value="(0,32),(0,64)"/>
+   <property name="chain1" value="(0,64),(32,64)"/>
+   <property name="chain2" value="(0,32),(32,64)"/>
+  </properties>
+ </tile>
+ <tile id="42">
+  <properties>
+   <property name="chain" value="(32,0),(64,0)"/>
+   <property name="chain2" value="(32,0),(64,32)"/>
+   <property name="chain3" value="(64,0),(64,32)"/>
+  </properties>
+ </tile>
+ <tile id="43">
+  <properties>
+   <property name="chain" value="(0,0),(32,0)"/>
+   <property name="chain2" value="(0,0),(0,32)"/>
+   <property name="chain3" value="(0,32),(32,0)"/>
   </properties>
  </tile>
 </tileset>

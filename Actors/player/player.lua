@@ -25,7 +25,7 @@ function Init()
 		power_spacialTether = false
 		power_speedBall = false
 		
-		tetherArrived = false
+	
 		power_boosterUpgrade = stage:HasPlayerPower( "boosterUpgrade" )
 		power_spacialTether = stage:HasPlayerPower( "spacialTether" )
 		power_gravitySwitch = stage:HasPlayerPower( "gravitySwitch" )
@@ -37,21 +37,7 @@ function Init()
         actor.health = maxHealth
 		
 		player = stage.player
-        --test
-        --groundThreshold = -.5
-        --groundThreshold = 5
-        --actor:SetSpriteEnabled( 0, true )
-		
-		tetherPos = ACTOR:b2Vec2()
-		tetherPos.x = 0
-		tetherPos.y = 0
-		
-		maxTetherVel = 65
-		
-		currentTetherVel = 0
-		
-		
-		
+
 		
 		reflector = false
 		accel = .8
@@ -171,171 +157,24 @@ function Init()
 		harrison3hitSet = actor:TileSetIndex( "harrison3hit.png" )
 		speedBallSet = actor:TileSetIndex( "speedball.png" )
 		greenRunSet = actor:TileSetIndex( "greenrun.png" )
-        --re = 5
-        --run = {}
-        --for i = 1, re * 10 do
-        --      run[i] = { jog, ( i - 1 ) / re }
-        --end
-        
 		
 		--actor:SetColor( 255,255,255,50 )
 		
 		
-		
-		
-		
-		--[[standToRun = {}
-		for i = 1, 4 * 2 do
-			standToRun[i] = { runSet, (i - 1) / 2 }
-		end
-		for i = 9, 14 do
-			standToRun[i] = { runSet, 4 }
-		end
-		
-		run = {}
-        for i = 1, 16 * 2 do
-           run[i] = { runSet, ( i + 7 ) / 2 }
-        end--]]
-		
+		hitstun = {}
+        for i = 1, 20 do
+			hitstun[i] = {doubleJumpSet, 2 }
+        end
+		---------------------
+		--**power actions**--
+		---------------------
 		speedBall = {}
 		for i = 1, 2 do
 			--speedBall[i] = { dashSet, 13 }
 			speedBall[i] = { speedBallSet, 0 }
 		end
 		
-		runningAttack = {}
-		for i = 1, 10 * 2 do
-			runningAttack[i] = { runningAttackSet, (i - 1)/2 }
-		end
-		
-		slide = {}
-		for i = 1, 5 do
-			slide[i] = { dashSet, 13 }
-		end
-		slideSlowFactor = 5
-		slideFriction = .15
-		slideLandFriction = .3
-		slideGrav = .8
-		
-		standToRun = {}
-		for i = 1, 2 * 3 do
-			standToRun[i] = { hrunSet, (i - 1) / 3 }
-		end
-		--for i = 9, 14 do
-		--	standToRun[i] = { runSet, 4 }
-		--end
-		
-		run = {}
-        for i = 1 * 3, 12 * 3 do
-           run[i] = { greenRunSet, (i - 1) / 3 }
-        end
-		
-		for i = 3 * 3, 14 * 3 do
-      --     run[i - 8] = { hrunSet, (i - 1) / 3 }
-        end
-		
-		
-		wallCling = {}
-		
-		
-		wallCling[1] = { wallClingSet, 0 }
-		--wallCling[2] = { wallClingSet, 0 }
-		
-		
-		
-		--[[run = {}
-        for i = 1, 2 * 3 do
-                run[i] = { jogSet2, ( i - 1 ) / 2 }
-        end
-        run[7] = { jogSet2, 4 }
-        for i = 8, 2 * 13 - 1 do
-                run[i] = { jogSet2, ( i - 1 ) / 2 }
-        end--]]
-		
-		dropThrough = false --so you dont go into the slide animation when you drop through
-       
-		
-		
-		--for i = 1, 16 do
-		--	run[i] = { runSet, i + 3 }
-		--end
-        maxRunSpeed = 88
-       
-       
-        stand = {}
-        for i = 1, 3 * 35 do
-			stand[i] = { standSet, ( i - 1 ) / 3 }
-        end
- 
-       
-        jump = {}
-        for i = 1, 5 do
-			jump[i] = { jumpSet, i - 1 }
-        end
-        jumpStrength = 30.5
-        
-		tetherPull = {}
-		for i = 1, 2 do
-			tetherPull[i] = {doubleJumpSet, 2 }
-		end
-		tetherPullAccel = 2
-		
-        landing = {}
-        for i = 6, 7 do
-			landing[i] = { jumpSet, i - 1 }
-        end
-       
-        doubleJump = {}
-        for i = 1, 1 * 39 do
-			doubleJump[i] = { doubleJumpSet, ( i - 1 ) / 1}
-        end
-        doubleJumpStrength = 26--25
-        hasDoubleJump = true
-       
-        bounceJump = {}
-        for i = 1, 1 * 34 do
-			bounceJump[i] = { doubleJumpSet, ( i - 1 ) / 1}
-        end
-        bounceJumpStrength = 30
-        actorBounceJump = false
-       
-        dash = {}
-        for i = 1, 4 * 1 do
-			dash[i] = { dashSet, (i - 1)/1 }
-        end
-        for i = 5, 30 do
-        dash[i] = { dashSet, 4 }
-        end
-        dashSpeed = 14
-        maxDashFrames = 30
-       
-        dashToStand = {}
-        for i = 1,13 do
-			dashToStand[i] = { dashSet, 4 + i }
-        end
-       
-        wallPress = {}
-        for i = 1, 3 * 35 do
-			wallPress[i] = { standSet, ( i - 1 ) / 3 }
-        end
-       
-        framesDashing = 0
-       
-       
-        wallJumpFrames = 15
-        wallJump = {}
-        for i = 1, wallJumpFrames * 2 do
-			if i <= 2 * 2 then
-				wallJump[i] = { walljumpstartSet, (i - 1) / 2 }
-			else
-				wallJump[i] = { walljumpSet, (i - 5) / 2}
-			end
-			
-        end
-        wallJumpStrengthY = 28
-        wallJumpStrengthX = 11
-       
-        maxAirDashFrames = 20--17
+		maxAirDashFrames = 20--17
         airDash = {}
         for i = 1, maxAirDashFrames do
 			if i <= 2 then
@@ -354,8 +193,29 @@ function Init()
 		for i = 1, 5 * 2 do
 			airDashToFall[i] = {airDashSet, (i - 1) / 2 + 3 }
 		end
-       
-        groundComboAttack1 = {}
+		
+		gravitySlash = {}
+        for i = 1, 24 do
+			gravitySlash[i] = { doubleJumpSet, 10 }
+        end
+		gravitySlashSpeedFactor = 18
+        gravitySlashRateX = 1
+        gravitySlashRateY = 1
+        hasGravitySlash = false
+        endGravitySlash = false
+        gravityReverseLimit = 60 * 3
+        gravityReverseCounter = 0
+		
+		---------------------
+		--**ground attacks**--
+		---------------------
+		
+		runningAttack = {}
+		for i = 1, 10 * 2 do
+			runningAttack[i] = { runningAttackSet, (i - 1)/2 }
+		end
+		
+		groundComboAttack1 = {}
         for i = 1, 18 do
 		--for i = 1, 15 do
 			groundComboAttack1[i] = {harrison3hitSet, ( i - 1 ) }
@@ -390,8 +250,113 @@ function Init()
 		for i = 1, 10 do
 			dashAttack[i] = { dashSet, 4 }
 		end
+		
+		---------------------
+		--**ground movement**--
+		---------------------
+		
+		slide = {}
+		for i = 1, 5 do
+			slide[i] = { dashSet, 13 }
+		end
+		slideSlowFactor = 5
+		slideFriction = .15
+		slideLandFriction = .3
+		slideGrav = .8
+		
+		standToRun = {}
+		for i = 1, 2 * 3 do
+			standToRun[i] = { hrunSet, (i - 1) / 3 }
+		end
+		--for i = 9, 14 do
+		--	standToRun[i] = { runSet, 4 }
+		--end
+		
+		run = {}
+        for i = 1 * 3, 12 * 3 do
+           run[i] = { greenRunSet, (i - 1) / 3 }
+        end
+		
+		for i = 3 * 3, 14 * 3 do
+      --     run[i - 8] = { hrunSet, (i - 1) / 3 }
+        end
+		
+		stand = {}
+        for i = 1, 3 * 35 do
+			stand[i] = { standSet, ( i - 1 ) / 3 }
+        end
+		
+		jump = {}
+        for i = 1, 5 do
+			jump[i] = { jumpSet, i - 1 }
+        end
+        jumpStrength = 30.5
+		
+		landing = {}
+        for i = 6, 7 do
+			landing[i] = { jumpSet, i - 1 }
+        end
+		
+		dash = {}
+        for i = 1, 4 * 1 do
+			dash[i] = { dashSet, (i - 1)/1 }
+        end
+        for i = 5, 30 do
+        dash[i] = { dashSet, 4 }
+        end
+        dashSpeed = 14
+        maxDashFrames = 30
+		framesDashing = 0
        
-	    forwardAirAttack = {}
+        dashToStand = {}
+        for i = 1,13 do
+			dashToStand[i] = { dashSet, 4 + i }
+        end
+		
+		---------------------
+		--**aerial movement**--
+		---------------------
+		
+		wallCling = {}
+		wallCling[1] = { wallClingSet, 0 }
+		
+		doubleJump = {}
+        for i = 1, 1 * 39 do
+			doubleJump[i] = { doubleJumpSet, ( i - 1 ) / 1}
+        end
+        doubleJumpStrength = 26--25
+        hasDoubleJump = true
+		
+		wallPress = {}
+        for i = 1, 3 * 35 do
+			wallPress[i] = { standSet, ( i - 1 ) / 3 }
+        end
+		
+		wallJumpFrames = 15
+        wallJump = {}
+        for i = 1, wallJumpFrames * 2 do
+			if i <= 2 * 2 then
+				wallJump[i] = { walljumpstartSet, (i - 1) / 2 }
+			else
+				wallJump[i] = { walljumpSet, (i - 5) / 2}
+			end
+			
+        end
+        wallJumpStrengthY = 28
+        wallJumpStrengthX = 11
+		
+		fastFall = {}
+        for i = 1, 5 do
+			fastFall[i] = { doubleJumpSet, 15 }
+        end
+        fastFallBoost = 40
+        fastFallMax = 40
+		
+		---------------------
+		--**aerial attacks**--
+		---------------------
+		
+		forwardAirAttack = {}
         for i = 1, 5 do
 			forwardAirAttack[i] = {fairSet, (i-1) }
         end
@@ -412,42 +377,24 @@ function Init()
 			upAirAttack[i] = {jumpSet, 3}
 		end
 		
-		
-		
-		
 		downAirAttack = {}
-		--for i = 1, 44 do
-		--	downAirAttack[i] = {dairSet, (i-1) }
-        --end
 		for i = 1, 8 do
 			downAirAttack[i] = {dairSet, (i-1) }
 		end
 		for i = 1, 13*1 do
 			downAirAttack[i+8] = {dairSet, (i-1)/1 + 8 }
 		end
-		--for i = 1, 8 do
-		--	downAirAttack[i] = {dairSet, (i-1) }
-		--end
+		------------------------------------------------------------------------
 		
-		--for i = 1, 8 do
-		--	downAirAttack[i] = {dairSet, (i-1) }
-		--end
-	
-		
-		
-	   
-        --[[forwardAirAttack = {}
-        for i = 1, 3 do
-			forwardAirAttack[i] = {fairSet, (i-1) }
+		dropThrough = false --so you dont go into the slide animation when you drop through
+       
+       
+        bounceJump = {}
+        for i = 1, 1 * 34 do
+			bounceJump[i] = { doubleJumpSet, ( i - 1 ) / 1}
         end
-		
-		for i = 1, 13 * 2 do
-			forwardAirAttack[i + 3] = { fairSet, ((i - 1) / 2 + 3) }
-		end
-		
-		for i = 1, 8 do
-			forwardAirAttack[i + 29] = {fairSet, (i-1) + 16 }
-		end--]]
+        bounceJumpStrength = 30
+        actorBounceJump = false
        
         timeWave = {}
         for i = 1, 45 do
@@ -459,29 +406,6 @@ function Init()
         timeWaveStoredAction = nil
         timeWaveStoredFrame = 1
        
-        fastFall = {}
-        for i = 1, 5 do
-			fastFall[i] = { doubleJumpSet, 15 }
-        end
-        fastFallBoost = 40
-        fastFallMax = 40
-       
-        gravitySlash = {}
-        for i = 1, 24 do
-			gravitySlash[i] = { doubleJumpSet, 10 }
-        end
-		gravitySlashSpeedFactor = 18
-        gravitySlashRateX = 1
-        gravitySlashRateY = 1
-        hasGravitySlash = false
-        endGravitySlash = false
-        gravityReverseLimit = 60 * 3
-        gravityReverseCounter = 0
-       
-        hitstun = {}
-        for i = 1, 20 do
-			hitstun[i] = {doubleJumpSet, 2 }
-        end
         --contact types--
         bodyTypes = {Normal = 1}
         bodyStrings = {"Normal"}
@@ -525,11 +449,9 @@ function Init()
 		
 		lastRadians = 0
 		
-		leftTetherGrown = false
-		rightTetherGo = false
 		rightStickDirTimerMax = 90
 		rightStickDirTimer = 0
-		--this whole section is just for the motion trail. if i dont need it i can remove this and any related variables.
+		
 end
  
 function GetAttackType( i )
@@ -613,8 +535,6 @@ function ActionEnded()
 						frame = 1
 				elseif action == slide then
 						frame = 5
-				elseif action == tetherPull then
-						frame = 1
 				elseif action == runningAttack then
 						SetAction( run )
 						frame = 1
@@ -667,12 +587,8 @@ function ChooseAction()
 			player:SetStoredRadians( lastRadians )
 		end
 		
-		if rightStickDirTimer > 0 then
-			rightStickDirTimer = rightStickDirTimer - 1
-		else
-			player:SetTetherAim( false )
-		--	print( "off" )
-		end
+		
+		
 		
 		if currentInput.Y and not prevInput.Y and action ~= speedBall and (action == stand or action == run or action == jump or action == doubleJump 
 		or  action == wallJump or action == dash or action == nil or action == standToRun or action == slide or action == fastFall or action == wallCling ) then
@@ -717,81 +633,35 @@ function ChooseAction()
 		--	player:ShrinkTether( .5, true )
 		end
 		
-		
-		leftTetherGrown = false
-		
 		local triggerThresh = 100
 		
-		if currentInput.rightTrigger > triggerThresh and prevInput.rightTrigger <= triggerThresh
-			or currentInput.leftTrigger > triggerThresh and prevInput.leftTrigger <= triggerThresh 
-		or currentInput.rightShoulder and not prevInput.rightShoulder or currentInput.leftShoulder and not prevInput.leftShoulder then
-			
-			
-			
-			if currentInput.leftTrigger > triggerThresh or currentInput.leftShoulder then
-				if leftState == "dormant" then
-					local vel = ACTOR:b2Vec2()
-					local shotSpeed = 70
-					vel.x = math.sin( lastRadians ) * shotSpeed
-					vel.y = math.cos( lastRadians ) * shotSpeed
-					print( "left shot" )
-					player:TetherShot( shotSpeed, true )
-					
-					if rightState == "locked" and currentInput.rightTrigger > triggerThresh then
-					--	player:ReleaseTether( false )
-					end
-				elseif leftState == "locked" then
-				--	player:ReleaseTether( true )
-					print( "this release left" )
-				end
+		if currentInput.leftTrigger > triggerThresh then
+			if prevInput.leftTrigger <= triggerThresh and leftState == "dormant" then
+				local vel = ACTOR:b2Vec2()
+				local shotSpeed = 70
+				vel.x = math.sin( lastRadians ) * shotSpeed
+				vel.y = math.cos( lastRadians ) * shotSpeed
+				
+				player:TetherShot( shotSpeed, true )
+				rightStickDirTimer = 0
 			end
-			
-			if currentInput.rightTrigger > triggerThresh or currentInput.rightShoulder then
-				if rightState == "dormant" then
-					local vel = ACTOR:b2Vec2()
-					local shotSpeed = 70
-					vel.x = math.sin( lastRadians ) * shotSpeed
-					vel.y = math.cos( lastRadians ) * shotSpeed
-					player:TetherShot( shotSpeed, false )
-					
-					--local test = lastRadians / math.pi * 180
-					--test = math.floor( test + .5 )
-					--print( "shooting right tether with radians: " .. test )
-					if leftState == "locked" and currentInput.leftTrigger > triggerThresh then
-					--	player:ReleaseTether( true )
-					end
-				elseif rightState == "locked" then
-					print( "this release right" )
-					--player:ReleaseTether( false )
-					rightTetherGo = false
-				end
-			end
-			
-			
-		end
-		
-		if not currentInput.rightShoulder and rightState == "locked" then
-			--player:ReleaseTether( false )
-		end
-		
-		if not currentInput.leftShoulder and leftState == "locked" then
-			--player:ReleaseTether( true )
-		end
-		
-		if currentInput.rightTrigger <= triggerThresh and rightState == "locked" then
-			player:ReleaseTether( false )
-			print( "right release 2" )
-		end
-		
-		if currentInput.leftTrigger <= triggerThresh and leftState == "locked" then
+		elseif currentInput.leftTrigger <= triggerThresh and leftState == "locked" then
 			player:ReleaseTether( true )
-			print( "left release 2" )
+		end
+		
+		if currentInput.rightTrigger > triggerThresh and prevInput.rightTrigger <= triggerThresh and rightState == "dormant" then			
+			local vel = ACTOR:b2Vec2()
+			local shotSpeed = 70
+			vel.x = math.sin( lastRadians ) * shotSpeed
+			vel.y = math.cos( lastRadians ) * shotSpeed
+			player:TetherShot( shotSpeed, false )
+			rightStickDirTimer = 0
+		elseif currentInput.rightTrigger <= triggerThresh and rightState == "locked" then
+			player:ReleaseTether( false )
 		end
 		
 		
 		
-		
-		--if currentInput.rightShoulder or currentInput.leftShoulder then
 		if (currentInput.rightTrigger > triggerThresh or currentInput.leftTrigger > triggerThresh) then
 			
 			local leftState = player:GetTetherState( true )
@@ -806,249 +676,55 @@ function ChooseAction()
 			end
 			
 			if rightState == "locked" and currentInput.rightTrigger > triggerThresh then
-			--if rightState == "locked" and currentInput.rightTrigger > triggerThresh then
-			
-				if currentInput.Y then
-					player:GrowTether( .5, false )
-				else
-					--print( "in this thing" )
-					player:LockTether( false )
-					--player:ShrinkTether( .5, false )
-					
-					
-					--actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y )
-					--rightTetherGo = true
-					
-					
-					if leftState == "locked" and currentInput.leftTrigger > triggerThresh then
-						player:ShrinkTether( .25, false )
-						player:ShrinkTether( .25, true )
-						--player:GrowTether( 1, true )
-						--leftTetherGrown = true
-					else
-						player:ShrinkTether( 1, false )
-					end
-					
-					print( "----" )
-				end
-				
-				
-			end
-			
-			if leftState == "locked" and currentInput.leftTrigger > triggerThresh then
-				--print( "blah left" )
-				if currentInput.Y then
-					player:GrowTether( .5, true )
-				else
-					player:LockTether( true )
-					
-					if currentInput.rightTrigger > triggerThresh and rightState == "locked" then
-						player:ShrinkTether( .25, true )
-						player:ShrinkTether( .25, false )
-					--	player:GrowTether( 1, false )
-					else
-						player:ShrinkTether( 1, true )
-					end
-				end
-				
+
 				--player:LockTether( false )
+				
+				if leftState == "locked" and currentInput.leftTrigger > triggerThresh then
+					player:ShrinkTether( .25, false )
+					player:ShrinkTether( .25, true )
+					--player:GrowTether( 1, true )
+				else
+					player:ShrinkTether( 1, false )
+				end
+					
+			end
+			
+			if leftState == "locked" and currentInput.leftTrigger > triggerThresh then				
 				--player:LockTether( true )
-			end
-			
-			if leftState == "locked" then
-					
-			--		player:LockTether( true )
-			end
-			if rightState == "locked" then
-			--	player:LockTether( false )
-			end
-			
-			
-		end
-		
-		if rightTetherGo then
-			player:ShrinkTether( 2.5, false )
-		end
-		
-		if false and (currentInput.rightTrigger > 100 or currentInput.leftTrigger > 100) then
-			--or (currentInput.leftTrigger > 10 and prevInput.leftTrigger < 10) then
-			
-			
-			--print( "in here" )
-			local vel = ACTOR:b2Vec2()
-			vel.x = 0
-			vel.y = 0
-			if currentInput:Left() then
-				vel.x = vel.x - 1
-			elseif currentInput:Right() then
-				vel.x = vel.x + 1
-			end
-			
-			if currentInput:Up() then
-				vel.y = vel.y - 1
-			elseif currentInput:Down() then
-				vel.y = vel.y + 1
-			end
-			
-			if vel.x == 0 and vel.y == 0 then
-				if actor:IsFacingRight() then
-					vel.x = vel.x + 1
+				
+				if currentInput.rightTrigger > triggerThresh and rightState == "locked" then
+					player:ShrinkTether( .25, true )
+					player:ShrinkTether( .25, false )
+				--	player:GrowTether( 1, false )
 				else
-					vel.x = vel.x - 1
-				end
-			end
-			
-			vel:Normalize()
-			
-			vel.x = vel.x * 40
-			vel.y = vel.y * 40
-			
-			--print( "tether shot" )
-			
-			local leftState = player:GetTetherState( true )
-			local rightState = player:GetTetherState( false )
-			
-			if currentInput.leftTrigger > 255 then
-				if leftState == "dormant" then
-					player:TetherShot( vel.x, vel.y, true )
-					print( "tether shot" )
-				elseif leftState == "shot" then
-					--do nothing for now
-				elseif leftState == "locked" then
-				--	player:ReleaseTether( true )
-					player:GrowTether( .1, true )
-			--		print( "release tether" )
-				elseif leftState == "anchored" then
-					player:LockTether( true )
-					print( "lock tether" )
-				end
-			end
-			
-			if not grounded or action == slide then
-			if currentInput.rightTrigger > 10 then
-				--print( "blah blah" )
-				if rightState == "dormant" then
-					player:TetherShot( vel.x, vel.y, false )
-					print( "tether shot" )
-				elseif rightState == "shot" then
-					--do nothing for now
-				elseif rightState == "locked" then
-					
-					
-					if currentInput.leftTrigger > 10 then
-						print( "shrink" )
-						player:ShrinkTether( .5, false )
-						print( "shrink over" )
-					else
-						player:GrowTether( .5, false )
-					end
-				--	player:ReleaseTether( true )
-			--		print( "release tether" )
-				elseif rightState == "anchored" then
-					player:LockTether( false )
-					print( "lock tether" )
+					player:ShrinkTether( 1, true )
 				end
 				
-				--print( "made it to the end" )
-				--[[if player:RightTetherActive() then
-					if rightTetherThing then
-						player:ReleaseTether( false )
-					else
-						player:MaxTetherLength( true )
-						rightTetherThing = true
-					end
-					print( "right tether released" )
-				else
-					player:TetherShot( vel.x, vel.y, false )
-					rightTetherThing = false
-				end--]]
-				
 			end
-			end
-			
-		--	print( "After tether shot" )
-			--if not tethered then
-				--tethered = true
-			
-				--[[local posX = actor:GetPosition().x
-				local posY = actor:GetPosition().y
-				
-				posY = posY - 10
-				if actor:IsFacingRight() then
-					posX = posX + 10
-				else
-					posX = posX - 10
-				end
-				
-				player:CreateTether( posX, posY, 10)
-				SetAction( jump )
-				frame = 3
-				print( "create tether" )--]]
-			--else
-			--	tethered = false
-				--player:ReleaseTether()
-				--print( "release tether" )
-			--end
-		elseif (currentInput.rightTrigger < 10 and prevInput.rightTrigger > 10)
-			or (currentInput.leftTrigger < 10 and prevInput.leftTrigger > 10) then
-			local leftState = player:GetTetherState( true )
-			local rightState = player:GetTetherState( false )
-			
-			if currentInput.leftTrigger < 10 and prevInput.leftTrigger > 10 then
-				if leftState == "locked" then
-				--	player:ReleaseTether( true )
-				end
-			end
-			
-			if currentInput.rightTrigger < 10 and prevInput.rightTrigger > 10 then
-				
-				if rightState == "locked" then
-					--print( "Releasing right tether" )
-				--	player:ReleaseTether( false )
-					--print( "done releasing" )
-				end
-			end
-		end
+		end		
 		
-		
-		if action == tetherPull then
-			local dX = actor:GetPosition().x - tether:GetPosition().x
-			local dY = actor:GetPosition().y - tether:GetPosition().y
-			actionChanged = true
-			if tetherArrived then
-				actor:SetPosition( tether:GetPosition().x, tether:GetPosition().y )
-				actor:SetVelocity( 0, 0 )
-				SetAction( jump )
-				frame = 3
-				hasDoubleJump = false
-				hasGravitySlash = false
-				hasAirDash = false
-				tether:Message( actor, "explode", 0 )
-				tetherOn = false
-				
-				
-				actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, 0, .5, 1.5, 0 )
-			else
-				grounded = false
-			end
+		if rightStickDirTimer > 0 then
+			rightStickDirTimer = rightStickDirTimer - 1
+		else
+			player:SetTetherAim( false )
 		end
 		
 		
 		if currentInput.leftShoulder and not prevInput.leftShoulder and not stage.cloneWorld then
-		--	stage.cloneWorldStart = true
+			stage.cloneWorldStart = true
 		end
 		
 		if currentInput.leftShoulder and not prevInput.leftShoulder and stage.cloneWorld then
-		--	stage.cloneWorldExtra = true
+			stage.cloneWorldExtra = true
 		end
 		
 		if currentInput:AltLeft() and not prevInput:AltLeft() and stage.cloneWorld then
 		--	stage.cloneWorldRevert = true
 		end
 		
-		--if currentInput:AltRight() and not prevInput:AltRight() and stage.cloneWorld then
-		--	stage.cloneWorldCollapse = true
-		--end
+		if currentInput.rightShoulder and not prevInput.rightShoulder and stage.cloneWorld then
+			stage.cloneWorldCollapse = true
+		end
 		
 		if stage.cloneWorld and currentInput.Y and not prevInput.Y then
 			--print( "creating the time wave" )
@@ -1067,66 +743,8 @@ function ChooseAction()
 		
 		
 		
-		tetherArrived = false
 		
 		
-		if false then
-        if not stage.cloneWorld and action ~= tetherPull and not actionChanged and currentInput.Y and not prevInput.Y and 
-		(action == wallJump or action == wallCling or action == stand or action == dashToStand or action == dash or action == run 
-		or action == standToRun or (action == forwardAirAttack and frame > 7 ) or (action == downAirAttack and frame > 7 )
-		or (action == upAirAttack and frame > 7 ) or action == jump or action == doubleJump or action == airDashToFall 
-		or action == slide or action == fastFall) then--and ( action == wallJump or action == stand or action == nil or action == run or action == jump or action == doubleJump ) then
-                --timeWaveStoredVel.x = actor:GetVelocity().x
-                --timeWaveStoredVel.y = actor:GetVelocity().y
-                --timeWaveStoredAction = action
-                --timeWaveStoredFrame = frame
-				if tetherOn then
-					--tetherOn = false
-					--tether:Message( actor, "explode", 0 )
-					
-					SetAction( tetherPull )
-					frame = 1
-					tether:Message( actor, "tether_pull", 0 )
-					hasTether = false
-					grounded = false
-					actor:ClearPhysicsboxes()
-					
-					currentTetherVel = 0
-					
-					local difX = actor:GetPosition().x - tetherPos.x
-					local difY = actor:GetPosition().y - tetherPos.y
-					local len = math.sqrt( difX * difX + difY * difY )
-			
-					if len > 0 then
-						difX = difX / len
-						difY = difY / len
-						actor:SetVelocity( -difX * 10, -difY * 10 )
-						--actor:SetVelocity( 0, 0 )
-						prevVelocity.x = 0
-						prevVelocity.y = 0
-					else
-						
-						actor:SetVelocity( 0, 0 )
-						prevVelocity.x = 0
-						prevVelocity.y = 0
-					end
-					
-					--player:SetPosition( tetherPos.x, tetherPos.y )
-				elseif hasTether then				
-					local vel = ACTOR:b2Vec2()
-					vel.x = 0
-					vel.y = 0
-					--stage:CreateActor( "timewave", actor:GetPosition(), vel, actor:IsFacingRight(), false, 0, actor )
-					tether = stage:CreateActor( "tether", actor:GetPosition(), vel, actor:IsFacingRight(), false, 0, actor )
-					tetherPos.x = actor:GetPosition().x
-					tetherPos.y = actor:GetPosition().y
-					tetherOn = true
-				end
-                --SetAction( timeWave )
-                --frame = 1
-        end
-		
-		end
 		
         if not actionChanged and currentInput.X and not prevInput.X and grounded and action ~= speedBall then
 			if (action == stand or action == nil or action == dashToStand or action == slide ) then
@@ -1568,54 +1186,7 @@ function HandleAction()
 				--actor:SetSpriteOffset( 0, math.cos( angle ) * -1.3 + math.sin( angle ) * -.3, math.sin( angle ) * -1.3 + math.cos( angle ) * -.6 )
 			end
 		end
-	   
-        if action == tetherPull then
-			 local difX = actor:GetPosition().x - tetherPos.x
-			 local difY = actor:GetPosition().y - tetherPos.y
-			 local len = math.sqrt( difX * difX + difY * difY )
-			
-			if len > 0 then
-			
-				difX = difX / len
-				difY = difY / len
-				
-			--	actor:SetVelocity( actor:GetVelocity().x -tetherax * tetherPullAccel, actor:GetVelocity().y - tetheray * tetherPullAccel )
-				
-				--local full = actor:GetVelocity().x + actor:GetVelocity().y
-				--difX = actor:GetVelocity().x / full
-				--difY = actor:GetVelocity().y / full
-				
-				--[[local go = true
-				
-				
-				
-				if actor:GetVelocity().x > maxTetherVel then
-					go = false
-				elseif actor:GetVelocity().x < -maxTetherVel then
-					go = false
-				elseif actor:GetVelocity().y > maxTetherVel then
-					go = false
-				elseif actor:GetVelocity().y < -maxTetherVel then
-					go = false
-				end--]]
-				print( "vel before tether stuff: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
-				if math.abs(-difX * (currentTetherVel + 10)) <= maxTetherVel and math.abs( -difY * (currentTetherVel + 10) ) <= maxTetherVel then
-					actor:SetVelocity( -difX * ( currentTetherVel + 10 ), -difY * ( currentTetherVel + 10 ) )
-					currentTetherVel = currentTetherVel + tetherPullAccel
-					--actor:SetVelocity( actor:GetVelocity().x * 1.1, actor:GetVelocity().y * 1.1 )
-				end
-				--actor:SetVelocity( -difX * 30, -difY * 30 )
-				print( "vel from tether: " .. actor:GetVelocity().x .." ," .. actor:GetVelocity().y )
-				print( "difX: " .. difX .. ", difY: " .. difY )
-				grounded = false
-				angle = 0
-				
-				
-				invincibilityFrames = 2
-				actor:CreateBox( bodyTypes.Normal, Layer_PlayerHitbox, 0, .1, 1, 1, 0 )
-			end
-	    end
-		--tether:Message( actor, "explode", 0 )
+
 			
 	   
         if action == timeWave and frame == 1 then
@@ -2177,7 +1748,7 @@ function HandleAction()
        
     
         --this allows for slight slowing during an air dash. We can decide later if we like it or not. ( currently removed )
-        if ( action ~= wallJump or ( action == wallJump and frame > 10 )) and not grounded and action ~= airDash and action ~= gravitySlash and action ~= hitstun and action ~= tetherPull and action ~= speedBall then
+        if ( action ~= wallJump or ( action == wallJump and frame > 10 )) and not grounded and action ~= airDash and action ~= gravitySlash and action ~= hitstun and action ~= speedBall then
 				if airControlLock > 0 then
 					airControlLock = airControlLock - 1
 				else
@@ -2209,7 +1780,7 @@ function HandleAction()
                 actor:ClearHurtboxes()
                 --actor:CreateBox( bodyTypes.Normal, Layer_PlayerHurtbox, 0, 0, .5, 1.5, actor:GetAngle() * 3 )
                 actor:CreateBox( bodyTypes.Normal, Layer_PlayerHurtbox, 0, 0, .5, 1.5, angle )
-                if action ~= tetherPull and ( prevAction == dash or prevAction == airDash or prevAction == dashAttack) then
+                if ( prevAction == dash or prevAction == airDash or prevAction == dashAttack) then
                         actor:ClearPhysicsboxes()
 						--actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, 0, .5, .5, 0 )
                         actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, 0, .5, 1.5, 0 )
@@ -2265,7 +1836,7 @@ function HandleAction()
 				actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y * 3 / 4 )
         end
         --print( "before d: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
-        if grounded and action ~= dash and action ~= hitstun and action ~= tetherPull then
+        if grounded and action ~= dash and action ~= hitstun then
 				if action ~= slide then				
 					if currentInput:Left() then
 						if action ~= runningAttack or not actor:IsFacingRight() then
@@ -2275,7 +1846,7 @@ function HandleAction()
 							if actor:GetVelocity().x > -groundMaxControlSpeed then
 									actor:SetVelocity( math.max( -groundMaxControlSpeed, actor:GetVelocity().x - groundControlSpeed ), actor:GetVelocity().y  )
 							else
-									actor:SetVelocity( math.max( -maxRunSpeed, actor:GetVelocity().x), actor:GetVelocity().y )
+									actor:SetVelocity( math.max( -maxVelocity.x, actor:GetVelocity().x), actor:GetVelocity().y )
 							end
 						elseif action == runningAttack then
 							if actor:GetVelocity().x >= 0 then
@@ -2291,7 +1862,7 @@ function HandleAction()
 							if actor:GetVelocity().x < groundMaxControlSpeed then
 									actor:SetVelocity( math.min( groundMaxControlSpeed, actor:GetVelocity().x + groundControlSpeed), actor:GetVelocity().y )
 							else
-									actor:SetVelocity( math.min( maxRunSpeed, actor:GetVelocity().x), actor:GetVelocity().y )
+									actor:SetVelocity( math.min( maxVelocity.x, actor:GetVelocity().x), actor:GetVelocity().y )
 							end
 						elseif action == runningAttack then
 							if actor:GetVelocity().x <= 0 then
@@ -2357,7 +1928,7 @@ function HandleAction()
 			--grav = .5
 		end
 		
-        if action ~= airDash and action ~= tetherPull then--and action ~= speedBall then
+        if action ~= airDash then--and action ~= speedBall then
         --if not grounded and action ~= airDash then
                 if ( action == stand or action == dashToStand ) and trueGrounded then	
 				--	actor:SetVelocity( actor:GetVelocity().x - groundNormal.x * grav, actor:GetVelocity().y - groundNormal.y *  grav )
@@ -3350,7 +2921,6 @@ function UpdatePostPhysics()
 		local rightState = player:GetTetherState( false )
 			
 		if leftState == "locked" and rightState == "locked" then
-			--leftTetherGrown = false
 			player:LockTether( true )
 			player:LockTether( false )
 		end
@@ -3929,8 +3499,6 @@ function Message( sender, msg, tag )
 		elseif msg == "tether_destroyed" then
 			--damaged or meter damaged?
 			tetherOn = false
-		elseif msg == "tether_arrived" then
-			tetherArrived = true
 		elseif msg == "tether_damage" then
 			actor.health = actor.health - tag
 			if actor.health <= 0 then
@@ -3948,14 +3516,7 @@ function Die()
 end
 
 function SaveState()
-	save_tetherArrived = tetherArrived
-	
-	
-	save_tetherPosX = tetherPos.x
-	save_tetherPosY = tetherPos.y
-	
-	save_currentTetherVel = currentTetherVel
-   
+
 	save_reflector = reflector
 	
 	save_lastGrounded = lastGrounded
@@ -4052,14 +3613,7 @@ function SaveState()
 
 end
 
-function LoadState()
-	save_tetherArrived = tetherArrived
-		
-	tetherPos.x = save_tetherPosX 
-	tetherPos.y = save_tetherPosY 
-	
-	currentTetherVel = save_currentTetherVel 
-   
+function LoadState()    
 	reflector = save_reflector 
 	
 	lastGrounded = save_lastGrounded 
