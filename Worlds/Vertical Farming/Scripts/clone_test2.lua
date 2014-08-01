@@ -66,7 +66,7 @@ function Init()
 	stage:SetCameraMaxVelocityY( 200 )
 	--change this between true and false to show a debug display of the physics objects
 	
-	stage:DebugDrawOn( true, true )
+	--stage:DebugDrawOn( true, false )
 	zoomCount = 0
 	maxZoomCount = 60
 	
