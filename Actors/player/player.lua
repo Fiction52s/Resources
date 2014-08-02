@@ -274,7 +274,7 @@ function Init()
 		
 		run = {}
         for i = 1 * 3, 12 * 3 do
-           run[i] = { greenRunSet, (i - 1) / 3 }
+           run[i-2] = { greenRunSet, (i - 1) / 3 }
         end
 		
 		for i = 3 * 3, 14 * 3 do
@@ -514,6 +514,7 @@ function ActionEnded()
 				elseif action == slide then
 						frame = 5
 				elseif action == runningAttack then
+						print( "set to run" )
 						SetAction( run )
 						frame = 1
 						actionChanged = false
@@ -696,16 +697,15 @@ function ChooseAction()
 			stage.cloneWorldCollapse = true
 		end
 		
-		if stage.cloneWorld and currentInput.Y and not prevInput.Y then
+		if not stage.cloneWorld and currentInput.rightShoulder and not prevInput.rightShoulder then
 			--print( "creating the time wave" )
-			--local vel = ACTOR:b2Vec2()
-			--vel.x = 0
-			--vel.y = 0
-			--stage:CreateActor( "timewave", actor:GetPosition(), vel, actor:IsFacingRight(), false, 0, actor )
+			local vel = ACTOR:b2Vec2()
+			vel.x = 0
+			vel.y = 0
+			stage:CreateActor( "timewave", actor:GetPosition(), vel, actor:IsFacingRight(), false, 0, actor )
 			--print( "creating the time wave" )
 			--collapse
 			--stage.cloneWorldCollapse = true
-			
 		end
 
         if not actionChanged and currentInput.X and not prevInput.X and grounded and action ~= speedBall then
@@ -1565,10 +1565,13 @@ function HandleAction()
 			else
 				--actor:SetSpriteOffset( 0, -1, -1 )
 			end
+			--if frame >=4 and frame <= 5 then
+			Sword( .5,0, 1, 1.5 )
 			
 		end
 		
 		if action == run then
+			print( "setting to run stuff" )
 			actor:SetSpriteOffset( 0, 0, -.25 )
 		end
 		
@@ -2235,6 +2238,8 @@ function UpdatePrePhysics()
 				actor:SetVelocity( 0, 0 )
 			end
 	    end
+		
+		
 	   
         if rcCount < 3 and not grounded and trueGrounded and groundNormal.y ~= 0 then
 		--	trueGrounded = false
@@ -2287,10 +2292,13 @@ function UpdatePrePhysics()
                 end
         end
        
-		
+
+		print( "made it here. frame: " .. frame )
         actor:SetSprite( 0, action[frame][1], action[frame][2] )
+		
         actor:SetSpriteAngle( 0, angle / math.pi )
 		
+		print( "actually set the sprite" )
 
  
         trueGrounded = false
@@ -2440,7 +2448,7 @@ function HitActor( otherActor, hitboxTag )
 		end
 		
 		print( "hitbox tag: " .. hitboxTag )
-        return hitboxStrings[hitboxTag], 10, 3, 0, 0
+        return hitboxStrings[hitboxTag], 10, 0, 0, 0
 
         --return type, damage, hitlag, hitstun, centerX (relative to this actor)
 end
@@ -2523,7 +2531,7 @@ function HitByActor( otherActor, hitboxName, damage, hitlag, xhitstun, hurtboxTa
 end
  
 --when you collide with some Actor
-function CollideWithActor( otherActor, tag )
+function CollideWithActor( otherActor, tag, normal )
 
         return true, true
         --enable then active
