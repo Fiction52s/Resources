@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tileset SYSTEM "http://mapeditor.org/dtd/1.0/map.dtd">
 <tileset name="blacktiles" tilewidth="64" tileheight="64">
  <properties>
   <property name="collide" value="black_collide"/>
@@ -225,6 +226,27 @@
    <property name="chain" value="(0,0),(0,64)"/>
    <property name="chain1" value="(0,0),(32,0)"/>
    <property name="chain2" value="(0,64),(32,0)"/>
+  </properties>
+ </tile>
+ <tile id="36">
+  <properties>
+   <property name="chain" value="(0,10),(19,10)"/>
+   <property name="chain2" value="(19,10),(19,54)"/>
+   <property name="chain3" value="(0,54),(19,54)"/>
+  </properties>
+ </tile>
+ <tile id="37">
+  <properties>
+   <property name="chain" value="(10,0),(10,19)"/>
+   <property name="chain2" value="(54,0),(54,19)"/>
+   <property name="chain3" value="(10,19),(54,19)"/>
+  </properties>
+ </tile>
+ <tile id="38">
+  <properties>
+   <property name="chain" value="(45,10),(64,10)"/>
+   <property name="chain1" value="(45,10),(45,54)"/>
+   <property name="chain3" value="(45,54),(64,54)"/>
   </properties>
  </tile>
  <tile id="39">

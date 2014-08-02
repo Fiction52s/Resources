@@ -55,6 +55,7 @@ function Init()
         rcPoint.y = 0
         rcFraction = 0
 		rampSlopeAdjust = false
+		rampBoost = 30
 		
 		hitlagVel = ACTOR:b2Vec2()
 		hitlagVel.x = 0
@@ -2185,12 +2186,17 @@ function UpdatePrePhysics()
 
 	
 		--hold up to hold your momentum off of a cliff
+		
 		if ((oldGroundNormal.x > 0 and groundNormal.x <= 0 and actor:GetVelocity().x < 0) 
 			or (oldGroundNormal.x < 0 and groundNormal.x >= 0 and actor:GetVelocity().x > 0)) and currentInput:Up() then
 			grounded = false
-			
-	    end
-		
+			print( "before: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+			actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y - ( math.abs(actor:GetVelocity().y) / maxVelocity.x ) * rampBoost )
+			print( "after: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+	    elseif not grounded and lastGrounded and ((oldGroundNormal.x > 0 and actor:GetVelocity().x < 0) 
+			or (oldGroundNormal.x < 0 and actor:GetVelocity().x > 0)) and currentInput:Up() then
+				actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y - ( math.abs(actor:GetVelocity().y) / maxVelocity.x ) * rampBoost )
+		end
 		if slopeSlow then
 			grounded = false
 			
