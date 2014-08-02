@@ -313,6 +313,15 @@ function Init()
 			dashToStand[i] = { dashSet, 4 + i }
         end
 		
+		onSteepRightSlope = false
+		onSteepLeftSlope = false
+		forcedSlide = {}
+		for i = 1, 2 do
+			forcedSlide[i] = { dashSet, 4 }
+		end
+		
+		slopeClimb = {}
+		
 		---------------------
 		--**aerial movement**--
 		---------------------
@@ -520,6 +529,8 @@ function ActionEnded()
 						actionChanged = false
 				elseif action == speedBall then
 						frame = 1
+				elseif action == forcedSlide then
+						frame = 1
                 else
                         SetAction( nil )
 						actionChanged = false
@@ -596,6 +607,9 @@ function ChooseAction()
 				--actor:ClearPhysicsboxes()
 			
 		end
+		
+		
+		
 		
 		
 		if currentInput.rightShoulder and rightState == "locked" then
@@ -777,7 +791,7 @@ function ChooseAction()
                         frame = 1
                 end
                 if action ~= jump and action ~= doubleJump and action ~= wallJump and action ~= airDash and action ~= forwardAirAttack and action ~= upAirAttack and action ~= downAirAttack and action ~= fastFall
-                        and action ~= gravitySlash and action ~= airDashToFall then
+                        and action ~= gravitySlash and action ~= airDashToFall and ( action ~= forcedSlide or not ( onSteepLeftSlope or onSteepRightSlope) ) then
                         SetAction( jump )
                         actionChanged = false
                         frame = 3
@@ -852,7 +866,7 @@ function ChooseAction()
        
         if not actionChanged then
                 if action == stand or action == dashToStand or action == run or action == standToRun or action == nil or action == jump or action == doubleJump or action == forwardAirAttack or action == downAirAttack or action == upAirAttack
-				or action == wallJump or action == slide or action == fastFall then
+				or action == wallJump or action == slide or action == fastFall or action == forcedSlide then
                         if grounded and currentInput:Left() then
                                 actor:FaceLeft()
                                 if action ~= run and action ~= standToRun then
@@ -893,7 +907,7 @@ function ChooseAction()
 		
 		--and not( currentInput:Left() or currentInput:Right() )
 		power_boosterUpgrade = true
-        if power_boosterUpgrade and not actionChanged and action ~= speedBall then
+        if power_boosterUpgrade and not actionChanged and action ~= speedBall and action ~= forcedSlide then
                 if currentInput.B and not prevInput.B and currentInput:Down() and not grounded and action ~= gravitySlash and action ~= fastFall then
 					if action == forwardAirAttack or action == upAirAttack or action == downAirAttack then
 						if actor:GetVelocity().y < 0 then
@@ -992,9 +1006,11 @@ function ChooseAction()
                         end
                 end
         end
+		
+		
        
         if grounded and not actionChanged and action ~= speedBall and ( (action == airDash and groundNormal.y ~= -1 ) or action == airDashToFall or action == nil or action == jump or action == doubleJump or action == forwardAirAttack or action == upAirAttack or action == downAirAttack or action == wallCling or action == wallJump
-                or ( ( action == run or action == standToRun ) and not currentInput:Left() and not currentInput:Right() ) or action == fastFall ) then
+                or ( ( action == run or action == standToRun ) and not currentInput:Left() and not currentInput:Right() ) or action == fastFall or action == forcedSlide ) then
 				
 				SetAction( stand )
 				frame = 1
@@ -1027,6 +1043,8 @@ function HandleAction()
                         actor:SetVelocity( actor:GetVelocity().x * 2 / 3, actor:GetVelocity().y + fastFallBoost )
                 end
         end
+		
+		
        
 		if reflector and ((not grounded and touchingRightWall and prevVelocity.x > 0) or ( not grounded and touchingLeftWall and prevVelocity.x < 0)) then
 
@@ -1404,7 +1422,7 @@ function HandleAction()
        
     
         --this allows for slight slowing during an air dash. We can decide later if we like it or not. ( currently removed )
-        if ( action ~= wallJump or ( action == wallJump and frame > 10 )) and not grounded and action ~= airDash and action ~= gravitySlash and action ~= hitstun and action ~= speedBall then
+        if ( action ~= wallJump or ( action == wallJump and frame > 10 )) and not grounded and action ~= airDash and action ~= gravitySlash and action ~= hitstun and action ~= speedBall and action ~= forcedSlide then
 				if airControlLock > 0 then
 					airControlLock = airControlLock - 1
 				else
@@ -1571,7 +1589,6 @@ function HandleAction()
 		end
 		
 		if action == run then
-			print( "setting to run stuff" )
 			actor:SetSpriteOffset( 0, 0, -.25 )
 		end
 		
@@ -2293,12 +2310,11 @@ function UpdatePrePhysics()
         end
        
 
-		print( "made it here. frame: " .. frame )
+
         actor:SetSprite( 0, action[frame][1], action[frame][2] )
 		
         actor:SetSpriteAngle( 0, angle / math.pi )
 		
-		print( "actually set the sprite" )
 
  
         trueGrounded = false
@@ -2309,6 +2325,10 @@ function UpdatePrePhysics()
         touchingLeftWall = false
         prevAction = action
         prevFrame = frame
+		
+		onSteepLeftSlope = false
+		onSteepRightSlope = false
+		
 
 	   
    ---   print( "vel1: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
@@ -2414,6 +2434,18 @@ function UpdatePostPhysics()
 			actor:SetSprite( 0, action[frame][1], action[frame][2] )
 		end
 		
+		if actor:GetVelocity().y >= -extraVel and (action == jump or action == doubleJump or ( action == wallJump and frame > 15--[[25--]] ) or ( action == gravitySlash and frame > 18 ) ) and (onSteepLeftSlope or onSteepRightSlope) and action ~= airDash and action ~= forcedSlide then
+			SetAction( forcedSlide )
+			frame = 1
+			
+			if onSteepLeftSlope then
+				actor:FaceRight()
+			elseif onSteepRightSlope then
+				actor:FaceLeft()
+			end
+			actor:SetSprite( 0, action[frame][1], action[frame][2] )
+		end
+			
 		--collectgarbage()
 end
  
@@ -2620,47 +2652,59 @@ function HandleStageCollision( pointCount, point1, point2, normal, enabled )
 		end
 		
         if normal.y < -.5 and enabled and action ~= speedBall then
+			if not lastGrounded and currentInput:Down() and not ( currentInput:Right() or currentInput:Left() ) and normal.y > -1 then
+				actor:SetFriction( slideLandFriction )
+			elseif not lastGrounded and currentInput:Down() and not ( currentInput:Right() or currentInput:Left() ) then
+				actor:SetFriction( 0 )
+				--print( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" )
+			elseif action == slide and normal.y > -1 then
+				actor:SetFriction( slideFriction ) 
+			elseif action == slide then
+				actor:SetFriction( .3 ) 
+			end
+			
+	
+			if (action ~= jump and action ~= doubleJump) or frame > 1 and ( framesInAir > 16 or actor:GetVelocity().y >= 0 or not currentInput.A ) then
 				
-				if not lastGrounded and currentInput:Down() and not ( currentInput:Right() or currentInput:Left() ) and normal.y > -1 then
-					actor:SetFriction( slideLandFriction )
-				elseif not lastGrounded and currentInput:Down() and not ( currentInput:Right() or currentInput:Left() ) then
-					actor:SetFriction( 0 )
-					--print( "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" )
-				elseif action == slide and normal.y > -1 then
-					actor:SetFriction( slideFriction ) 
-				elseif action == slide then
-					actor:SetFriction( .3 ) 
+				
+				trueGrounded = true
+				if action == jump and framesInAir <=16 and currentInput.A and ((actor:GetVelocity().x > 0 and normal.x < 0) or (actor:GetVelocity().x < 0 and normal.x > 0 )) then
+					slopeSlow = true
 				end
 				
-		
-                if (action ~= jump and action ~= doubleJump) or frame > 1 and ( framesInAir > 16 or actor:GetVelocity().y >= 0 or not currentInput.A ) then
-					
-					
-					trueGrounded = true
-					if action == jump and framesInAir <=16 and currentInput.A and ((actor:GetVelocity().x > 0 and normal.x < 0) or (actor:GetVelocity().x < 0 and normal.x > 0 )) then
-						slopeSlow = true
-					end
-					
-					hasDoubleJump = true
-					hasAirDash = true
-					hasTether = true
-					if gravityReverseCounter == 0 then
-						hasGravitySlash = true
-					end
-					collisionPoint1.x = point1.x
-					collisionPoint1.y = point1.y
-					collisionPoint2.x = point2.x
-					collisionPoint2.y = point2.y
-				   
-					--print( "point1: " .. point1.x .. ", " .. point1.y )
-					--print( "grounded: " .. frame )
-				elseif action == jump and framesInAir <=16 and currentInput.A and ((actor:GetVelocity().x > 0 and normal.x < 0) or (actor:GetVelocity().x < 0 and normal.x > 0 ))  then
-					slopeSlow = true
-                end
+				hasDoubleJump = true
+				hasAirDash = true
+				hasTether = true
+				if gravityReverseCounter == 0 then
+					hasGravitySlash = true
+				end
+				collisionPoint1.x = point1.x
+				collisionPoint1.y = point1.y
+				collisionPoint2.x = point2.x
+				collisionPoint2.y = point2.y
+			   
+				--print( "point1: " .. point1.x .. ", " .. point1.y )
+				--print( "grounded: " .. frame )
+			elseif action == jump and framesInAir <=16 and currentInput.A and ((actor:GetVelocity().x > 0 and normal.x < 0) or (actor:GetVelocity().x < 0 and normal.x > 0 ))  then
+				slopeSlow = true
+			end
+		elseif enabled and normal.y >= -.5 and normal.y < 0 then
+			--print( "this one" )
+			if normal.x > 0 then
+				onSteepLeftSlope = true
+			elseif normal.x < 0 then
+				onSteepRightSlope = true
+			end
+			
+			if not currentInput:Down() and actor:GetVelocity().y >= 0 then
+				actor:SetFriction( 1 )
+			else
+				actor:SetFriction( 0 )
+			end
         elseif normal.y > .5 and enabled and action == gravitySlash then
-                actor:Reverse()
-                frame = #action
-                gravityReverseCounter = 1
+			actor:Reverse()
+			frame = #action
+			gravityReverseCounter = 1
         end
         local testY = point1.y
         if pointCount == 2 then
@@ -2672,6 +2716,8 @@ function HandleStageCollision( pointCount, point1, point2, normal, enabled )
         elseif enabled and normal.x < -wallThreshold and testY < actor:GetPosition().y + playerHeight - 0 then
 			touchingRightWall = true
         end
+		
+		--if enabled and normal.x > wa
        
         return enabled
 end
