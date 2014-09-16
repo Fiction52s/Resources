@@ -11,6 +11,7 @@ end
 
 function Init()
 	--note: 1 is the first index in Lua, not 0
+
 	player = stage.player
 	health = 10
 	speed = .5--1

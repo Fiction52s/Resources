@@ -86,7 +86,7 @@ function HandleCollision( tileID, actor, tileVec, collisionVec, normalVec )
 	end
 	
 	--if tileID == 105 or tileID == 91 or tileID == 104 or tileID == 118 then
-	if tileID == 39 then
+	if tileID == 39 or tileID == 38 or tileID == 37 or tileID == 36 then
 		--print( "i hit the spikes")
 		if actor.type == stage.player.type then
 			--actor:Kill() --send message spike kill

@@ -11,6 +11,8 @@ end
 
 function Init()
 	--note: 1 is the first index in Lua, not 0
+	
+--	print( "barrelthrowing init start" )
 	surroundingActors = 0
 	player = stage.player
 	health = 100
@@ -93,6 +95,8 @@ function Init()
 	
 	waitToFire = 120
 	framesWaited = 0
+	
+	print( "barrelthrowing init over" )
 end
 
 function GetAttackType( i )
@@ -131,6 +135,8 @@ function HandleAction()
 end
 
 function UpdatePrePhysics()	
+
+print( "a" )
 	local aPos = actor:GetPosition()
 	local offsetX = 1
 	aPos.y = aPos.y - 1
@@ -147,11 +153,12 @@ function UpdatePrePhysics()
 		aVel.y = -velY
 	end
 	
-	
+	print( "b" )
 	if framesWaited >= waitToFire then
 		stage:CreateActor( "barrel", aPos, aVel, actor:IsFacingRight(), false, 0, actor )
 		framesWaited = 0
 	end
+	print( "c" )
 	
 	--surroundingActors = 0
 	--print( "updating" )

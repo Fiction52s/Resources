@@ -12,6 +12,7 @@ end
 function Init()
 	--note: 1 is the first index in Lua, not 0
 	--hitboxCenterX = 0
+	print( "beginning" )
 	player = stage.player
 	
 	actor:SetSpriteEnabled( 0, true )
@@ -109,7 +110,7 @@ function Init()
 	
 	--actor:CreateCircle( hitboxTypes.Slash, Layer_PlayerHitbox, 0, 0, .5, )
 	actor:SetBodyAngle( angle )
-
+	print( "-----------------------" )
 
 end
 
@@ -141,10 +142,13 @@ function HandleAction()
 end
 
 function UpdatePrePhysics()	
+	print( "s----" )
 	ActionEnded()
 	
 	actor:ClearActorsAttacked()
 	
+	
+	print( "s0" )
 	if slowCounter == 0 then
 		if launch then
 			
@@ -170,6 +174,8 @@ function UpdatePrePhysics()
 			end
 		end
 	end
+	
+	print( "s1" )
 
 	if slowFactor ~= 1 then
 		actor:SetVelocity( actor:GetVelocity().x / slowFactor, actor:GetVelocity().y / slowFactor )

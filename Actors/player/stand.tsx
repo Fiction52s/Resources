@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE tileset SYSTEM "http://mapeditor.org/dtd/1.0/map.dtd">
-<tileset name="stand" tilewidth="66" tileheight="100">
- <image source="stand.png" width="2310" height="100"/>
+<tileset name="stand" tilewidth="64" tileheight="128">
+ <image source="stand.png" width="320" height="896"/>
  <tile id="0">
   <properties>
    <property name="actortype" value="player"/>

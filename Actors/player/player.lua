@@ -84,7 +84,7 @@ function Init()
         groundNormal = ACTOR:b2Vec2()
         groundNormal.x = 0
         groundNormal.y = 0
-        groundControlSpeed = 1
+        groundControlSpeed = .5
         groundMaxControlSpeed = 9
         trueGrounded = false
         slopeSlow = false
@@ -94,9 +94,9 @@ function Init()
 		forcedAirCounter = 0
         canInterruptJump = false
         grav = 2
-        airControlSpeed = 1.5
+        airControlSpeed = 4.5--1.5
         airSlowSpeed = .2
-        airMaxControlSpeed = 7
+        airMaxControlSpeed = 9
         extraVel = 8 --the velocity you maintain when you let go of jump during your first jump
         framesInAir = 0
         --minFallY = -1
@@ -142,14 +142,16 @@ function Init()
         jumpSet = actor:TileSetIndex( "jump.png" )
         --jogSet2 = actor:TileSetIndex( "jog2.png" )
         --dashSet = actor:TileSetIndex( "dash.png" )
-		dashSet = actor:TileSetIndex( "dash2.png" )
+		--dashSet = actor:TileSetIndex( "dash2.png" )
+		dashSet = actor:TileSetIndex( "greendash.png" )
         standSet = actor:TileSetIndex( "stand.png" )
-        doubleJumpSet = actor:TileSetIndex( "doublejump.png" )
+        doubleJumpSet = actor:TileSetIndex( "greendouble.png" )
 		hrunSet = actor:TileSetIndex( "hrun.png" )
-		wallClingSet = actor:TileSetIndex( "wallcling.png" )
-		walljumpSet = actor:TileSetIndex( "walljump.png" )
-		walljumpstartSet = actor:TileSetIndex( "walljumpstart.png" )
-		fairSet = actor:TileSetIndex( "fair.png" )
+		wallClingSet = actor:TileSetIndex( "greenwallcling.png" )--actor:TileSetIndex( "wallcling.png" )
+		--walljumpSet = actor:TileSetIndex( "walljump.png" )
+		--walljumpstartSet = actor:TileSetIndex( "walljumpstart.png" )
+		walljumpSet = actor:TileSetIndex( "greenwalljump.png" )
+		
 		airDashSet = actor:TileSetIndex( "airdash.png" )
         groundComboSet = actor:TileSetIndex( "groundcombo.png" )
 		uairSet = actor:TileSetIndex( "uair.png" )
@@ -158,7 +160,10 @@ function Init()
 		harrison3hitSet = actor:TileSetIndex( "harrison3hit.png" )
 		speedBallSet = actor:TileSetIndex( "speedball.png" )
 		greenRunSet = actor:TileSetIndex( "greenrun.png" )
+		standToRunSet = actor:TileSetIndex( "standtorun.png" )
 		
+		--fairSet = actor:TileSetIndex( "fair.png" )
+		fairSet = actor:TileSetIndex( "greenfair.png" )
 		--actor:SetColor( 255,255,255,50 )
 		
 		
@@ -267,7 +272,7 @@ function Init()
 		
 		standToRun = {}
 		for i = 1, 2 * 3 do
-			standToRun[i] = { hrunSet, (i - 1) / 3 }
+			standToRun[i] = { standToRunSet, (i - 1) / 3 }
 		end
 		--for i = 9, 14 do
 		--	standToRun[i] = { runSet, 4 }
@@ -275,7 +280,7 @@ function Init()
 		
 		run = {}
         for i = 1 * 3, 12 * 3 do
-           run[i-2] = { greenRunSet, (i - 1) / 3 }
+           run[i-2] = { greenRunSet, (i - 3) / 3 }
         end
 		
 		for i = 3 * 3, 14 * 3 do
@@ -310,7 +315,7 @@ function Init()
 		framesDashing = 0
        
         dashToStand = {}
-        for i = 1,13 do
+        for i = 1,12 do
 			dashToStand[i] = { dashSet, 4 + i }
         end
 		
@@ -326,6 +331,7 @@ function Init()
 		for i = 1, 2 do
 			slopeClimb[i] = { standSet, 0 }
 		end
+		hasSlopeJump = true
 		
 		---------------------
 		--**aerial movement**--
@@ -335,9 +341,13 @@ function Init()
 		wallCling[1] = { wallClingSet, 0 }
 		
 		doubleJump = {}
-        for i = 1, 1 * 39 do
-			doubleJump[i] = { doubleJumpSet, ( i - 1 ) / 1}
-        end
+        -- for i = 1, 1 * 39 do
+		--	doubleJump[i] = { doubleJumpSet, ( i - 1 ) / 1}
+        -- end
+		
+		for i = 1, 1 * 24 do
+			doubleJump[i] = { doubleJumpSet, ( i - 1 )}
+		end
         doubleJumpStrength = 26--25
         hasDoubleJump = true
 		
@@ -346,14 +356,15 @@ function Init()
 			wallPress[i] = { standSet, ( i - 1 ) / 3 }
         end
 		
-		wallJumpFrames = 15
+		wallJumpFrames = 14
         wallJump = {}
         for i = 1, wallJumpFrames * 2 do
-			if i <= 2 * 2 then
-				wallJump[i] = { walljumpstartSet, (i - 1) / 2 }
-			else
-				wallJump[i] = { walljumpSet, (i - 5) / 2}
-			end
+			--if i <= 2 * 2 then
+			--	wallJump[i] = { walljumpstartSet, (i - 1) / 2 }
+			--else
+			--	wallJump[i] = { walljumpSet, (i - 5) / 2}
+			--end
+			wallJump[i] = { walljumpSet, (i - 1) / 2}
 			
         end
         wallJumpStrengthY = 28
@@ -370,17 +381,23 @@ function Init()
 		--**aerial attacks**--
 		---------------------
 		
+		
 		forwardAirAttack = {}
-        for i = 1, 5 do
+		
+		for i = 1, 17 do
 			forwardAirAttack[i] = {fairSet, (i-1) }
+		end
+        
+		for i = 1, 5 do
+		--	forwardAirAttack[i] = {fairSet, (i-1) }
         end
 		
 		for i = 1, 11 * 2 do
-			forwardAirAttack[i + 5] = { fairSet, ((i - 1) / 2 + 5) }
+		--	forwardAirAttack[i + 5] = { fairSet, ((i - 1) / 2 + 5) }
 		end
 		
 		for i = 1, 8 do
-			forwardAirAttack[i + 27] = {fairSet, (i-1) + 16 }
+		--	forwardAirAttack[i + 27] = {fairSet, (i-1) + 16 }
 		end
 		
 		upAirAttack = {}
@@ -413,6 +430,9 @@ function Init()
         prevFrame = 1
         frame = 1
        
+	   leftState = "dormant"
+		rightState = "dormant"
+	   
         actor:SetVelocity( 0, 0 )
         --this will eventually be replaced with createBoxes ONLY IN UPDATE for each action, if the box changes during a dash or w.e.
         actor:ClearHurtboxes()
@@ -559,8 +579,8 @@ function ChooseAction()
             actionChanged = true
         end
 		
-		local leftState = player:GetTetherState( true )
-		local rightState = player:GetTetherState( false )
+		leftState = player:GetTetherState( true )
+		rightState = player:GetTetherState( false )
 		
 		
 		if currentInput.leftStickMagnitude > .5 and rightStickDirTimer == 0 then
@@ -656,8 +676,8 @@ function ChooseAction()
 		
 		if (currentInput.rightTrigger > triggerThresh or currentInput.leftTrigger > triggerThresh) then
 			
-			local leftState = player:GetTetherState( true )
-			local rightState = player:GetTetherState( false )
+			leftState = player:GetTetherState( true )
+			rightState = player:GetTetherState( false )
 			
 			if currentInput.rightTrigger > triggerThresh and rightState == "anchored" then
 				player:LockTether( false )
@@ -703,11 +723,11 @@ function ChooseAction()
 		
 		
 		if currentInput.leftShoulder and not prevInput.leftShoulder and not stage.cloneWorld then
-			stage.cloneWorldStart = true
+			--stage.cloneWorldStart = true
 		end
 		
 		if currentInput.leftShoulder and not prevInput.leftShoulder and stage.cloneWorld then
-			stage.cloneWorldExtra = true
+			--stage.cloneWorldExtra = true
 		end
 		
 		if currentInput:AltLeft() and not prevInput:AltLeft() and stage.cloneWorld then
@@ -811,23 +831,38 @@ function ChooseAction()
 		
 		wallJumpBoost = false
 		if not actionChanged then
-			if currentInput.A and not prevInput.A and ( onSteepRightSlope or onSteepLeftSlope ) and ( action == forcedSlide or action == slopeClimb ) then
-				if onSteepRightSlope then
+			 --currentInput.A and not prevInput.A and ( onSteepRightSlope or onSteepLeftSlope ) and ( action == forcedSlide  ) then
+			if ( onSteepRightSlope or onSteepLeftSlope ) and ( action == forcedSlide or action == slopeClimb ) then
+			
+				if ( currentInput:Left() and not prevInput:Left() ) and not currentInput:Down() and onSteepRightSlope then
 					touchingRightWall = true
-				else
-					touchingLeftWall = true
-				end
-				
-				
-				
-				if action == forcedSlide then
+					
+					if action == forcedSlide then
 					wallJumpBoost = true
+					
+					SetAction( wallJump )
+					frame = 1
 				end
 				
-				SetAction( wallJump )
-				frame = 1
+				end
+				
+				if ( currentInput:Right() and not prevInput:Right() ) and not currentInput:Down() and onSteepLeftSlope then
+					touchingLeftWall = true
+					
+					if action == forcedSlide then
+					wallJumpBoost = true
+					
+					SetAction( wallJump )
+					frame = 1
+					end
+				end
+				
+				
+				
+				
 			end
 		end
+		
  
         if not actionChanged then
                 if currentInput.A and not prevInput.A and grounded and ( action == stand or action == dashToStand or action == run or action == standToRun or action == nil or action == dash or action == slide  ) then
@@ -1004,7 +1039,8 @@ function ChooseAction()
                            or action == wallJump or ( action == forwardAirAttack and frame > 7 )  
 						   or ( action == upAirAttack and frame > 7 )
 						   or ( action == downAirAttack and frame > 7 ) ) and action ~= speedBall then
-						    
+		
+						if not (rightState == "locked" or leftState == "locked") then
                         SetAction( airDash )
                         frame = 1
                         hasAirDash = false
@@ -1018,6 +1054,8 @@ function ChooseAction()
                         else
                                 airDashingRight = actor:IsFacingRight()
                         end
+						
+						end
                 elseif not grounded and not currentInput.B and action == airDash then
                         --SetAction( jump )
 						SetAction( airDashToFall )
@@ -1127,8 +1165,10 @@ function HandleAction()
 
         if action == stand then
                 actor:SetVelocity( 0, 0 )
+				actor:SetSpriteOffset( 0, 0, -.25 )
 		elseif action == dashToStand then
 			actor:SetVelocity( actor:GetVelocity().x * 4/5, actor:GetVelocity().y * 4 / 5 )
+			actor:SetSpriteOffset( 0, 0, -.25 )
         elseif action == jump then
 			if frame == 1 then
 				grounded = false    
@@ -1175,21 +1215,23 @@ function HandleAction()
 				end
 			end
         elseif action == wallJump then
+			actor:SetSpriteOffset( 0, .5, 0 )
 			if frame == 1 then
 				if touchingRightWall then
 						actor:FaceLeft()
 						
 						if wallJumpBoost then
-							actor:SetVelocity( -wallJumpStrengthX + actor:GetVelocity().x / 2, -wallJumpStrengthY )
+							actor:SetVelocity( -wallJumpStrengthX + actor:GetVelocity().x, -wallJumpStrengthY )
 						else
-							actor:SetVelocity( -wallJumpStrengthX, -wallJumpStrengthY )
+							
+							actor:SetVelocity( -wallJumpStrengthX, -math.max( -actor:GetVelocity().y, wallJumpStrengthY ) )
 						end
 				elseif touchingLeftWall then
 				
 						if wallJumpBoost then
-							actor:SetVelocity( wallJumpStrengthX + actor:GetVelocity().x / 2, -wallJumpStrengthY )
+							actor:SetVelocity( wallJumpStrengthX + actor:GetVelocity().x, -wallJumpStrengthY )
 						else
-							actor:SetVelocity( wallJumpStrengthX, -wallJumpStrengthY )
+							actor:SetVelocity( wallJumpStrengthX, -math.max( -actor:GetVelocity().y, wallJumpStrengthY ) )
 						end
 						actor:FaceRight()
 						
@@ -1197,7 +1239,7 @@ function HandleAction()
 						actor:FaceLeft()
 						
 						if wallJumpBoost then
-							actor:SetVelocity( -wallJumpStrengthX + actor:GetVelocity().x / 2, -wallJumpStrengthY)
+							actor:SetVelocity( -wallJumpStrengthX + actor:GetVelocity().x, -wallJumpStrengthY)
 						else
 							actor:SetVelocity( -wallJumpStrengthX, -wallJumpStrengthY )
 						end
@@ -1205,7 +1247,7 @@ function HandleAction()
 						actor:FaceRight()
 						
 						if wallJumpBoost then
-							actor:SetVelocity( wallJumpStrengthX + actor:GetVelocity().x / 2, -wallJumpStrengthY)
+							actor:SetVelocity( wallJumpStrengthX + actor:GetVelocity().x, -wallJumpStrengthY)
 						else
 							actor:SetVelocity( wallJumpStrengthX, -wallJumpStrengthY )
 						end
@@ -1350,7 +1392,7 @@ function HandleAction()
         actorRightWallJump = false
        
         if action == dash then
-
+			actor:SetSpriteOffset( 0, 0, -.25 )
 			if currentInput:Right() and not actor:IsFacingRight() then
 				actor:FaceRight()
 				framesDashing = 0
@@ -1535,22 +1577,6 @@ function HandleAction()
                 
         end
 		
-		if action ~= airDash and prevAction == airDash then
-		--	actor:ClearPhysicsboxes()
-		--	actor:CreateBox( bodyTypes.Normal, Layer_PlayerPhysicsbox, 0, 0, .5, 1.5, 0 )
-			
-		--	 actor:ClearHurtboxes()
-                --actor:CreateBox( bodyTypes.Normal, Layer_PlayerHurtbox, 0, 0, .5, 1.5, actor:GetAngle() * 3 )
-         --    actor:CreateBox( bodyTypes.Normal, Layer_PlayerHurtbox, 0, 0, .5, 1.5, angle * 3.5 )
-		end
-		
-		
-      
-        if action == doubleJump and frame < 15 then
-                --actor:SetSpriteOffset( 0,-1 * frame / 15 )
-        end
-		
-		
 		if action == jump and ((grounded and touchingRightWall and actor:IsFacingRight()) or (grounded and touchingLeftWall and not actor:IsFacingRight())) then
                 --SetAction( stand )
                 --frame = 1
@@ -1558,6 +1584,15 @@ function HandleAction()
 				grounded = false
 				actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y * 3 / 4 )
         end
+		
+		if (action == run or action == dash or action == slide) and actor:GetVelocity().y < 0 and math.abs( actor:GetVelocity().x ) > groundMaxControlSpeed and ((grounded and touchingRightWall and actor:IsFacingRight()) or (grounded and touchingLeftWall and not actor:IsFacingRight())) then
+                --SetAction( stand )
+                --frame = 1
+				
+				grounded = false
+				--actor:SetVelocity( 0, actor:GetVelocity().y )
+        end
+		
         --print( "before d: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
         if grounded and action ~= dash and action ~= hitstun then
 				if action ~= slide then				
@@ -1637,7 +1672,7 @@ function HandleAction()
 			
 		end
 		
-		if action == run then
+		if action == run or action == standToRun then
 			actor:SetSpriteOffset( 0, 0, -.25 )
 		end
 		
@@ -1651,6 +1686,11 @@ function HandleAction()
 		
 		if action == speedBall then
 			--grav = .5
+		end
+		
+		if not grounded and ((leftState == "locked" or rightState == "locked") and currentInput.B) then
+			actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y - grav )
+			print( "WTF HEREEE!!!!!" )
 		end
 		
         if action ~= airDash then--and action ~= speedBall then
@@ -1707,25 +1747,15 @@ function HandleAction()
         else
                 --print( "------------------------------------------------------" )
         end
-      
-		
-		if grounded and action == airDash then
-			print( "here" )
-			if actor:IsReversed() then
-				  -- actor:SetPosition( actor:GetPosition().x, minGroundY + playerHeight )
-			else
-					--print( "lock1" )
-				--   actor:SetPosition( actor:GetPosition().x, minGroundY - playerHeight )
-			end
-		end
+
        
-        if grounded and (touchingLeftWall or touchingRightWall ) then
-			if touchingRightWall and actor:GetVelocity().x > 0 then
-				actor:SetVelocity( 0,0 )
-			elseif touchingLeftWall and actor:GetVelocity().x < 0 then
-				actor:SetVelocity( 0,0 )
-			end
-        end
+			--if touchingRightWall and actor:GetVelocity().x > 0 then
+       -- if grounded and (touchingLeftWall or touchingRightWall ) and math.abs( actor:GetVelocity().x ) <= groundMaxControlSpeed then
+	--			actor:SetVelocity( 0,0 )
+	--		elseif touchingLeftWall and actor:GetVelocity().x < 0 then
+	--			actor:SetVelocity( 0,0 )
+	--		end
+        --end
        
         if action == groundComboAttack1 then--and frame > 5 and frame < 15 then
 			--actor:ClearHitboxes()
@@ -1847,7 +1877,7 @@ function HandleAction()
 			end
         elseif action == forwardAirAttack then
 			--forwardAirAttack info
-			
+			actor:SetSpriteOffset( 0, .8, 0  )
 			if frame == 1 and actor:GetVelocity().y < 20 and not currentInput.A then
 				--actor:SetVelocity( actor:GetVelocity().x, -10 )
 			end
@@ -1931,6 +1961,7 @@ function HandleAction()
         end
 		
 		if action == slide then
+			actor:SetSpriteOffset( 0, 0, -.25 )
 			actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y + slideGrav )
 		end
        
@@ -2115,6 +2146,8 @@ function UpdatePrePhysics()
 		end
 		
 		if action == wallCling then 
+			
+			
 			maxFallVelocity = 10
 			
 			if actor:GetVelocity().y > -extraVel then
@@ -2131,11 +2164,26 @@ function UpdatePrePhysics()
 		end
 		
 		
+		
 		if action == slopeClimb and currentInput:Up() then
 			grav = 1.5
 		elseif action == slopeClimb then
 			--grav = 2
 		end
+		
+		if action ~= slopeClimb then
+			hasSlopeJump = true
+		end
+		
+		if action == slopeClimb and hasSlopeJump and ( currentInput.A and not prevInput.A ) then
+			if actor:IsFacingRight() then
+				actor:SetVelocity( actor:GetVelocity().x + 15, actor:GetVelocity().y - 15 )
+			else
+				actor:SetVelocity( actor:GetVelocity().x - 15, actor:GetVelocity().y - 15 )
+			end
+			hasSlopeJump = false
+		end
+				
 		  
 		if action == slopeClimb or action == forcedSlide then
 			hasDoubleJump = true
@@ -2188,13 +2236,13 @@ function UpdatePrePhysics()
 		--hold up to hold your momentum off of a cliff
 		
 		if ((oldGroundNormal.x > 0 and groundNormal.x <= 0 and actor:GetVelocity().x < 0) 
-			or (oldGroundNormal.x < 0 and groundNormal.x >= 0 and actor:GetVelocity().x > 0)) and currentInput:Up() then
+			or (oldGroundNormal.x < 0 and groundNormal.x >= 0 and actor:GetVelocity().x > 0)) and currentInput:Up() and not ( onSteepRightSlope or onSteepLeftSlope ) then
 			grounded = false
-			print( "before: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+		--	print( "before: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
 			actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y - ( math.abs(actor:GetVelocity().y) / maxVelocity.x ) * rampBoost )
-			print( "after: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+		--	print( "after: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
 	    elseif not grounded and lastGrounded and ((oldGroundNormal.x > 0 and actor:GetVelocity().x < 0) 
-			or (oldGroundNormal.x < 0 and actor:GetVelocity().x > 0)) and currentInput:Up() then
+			or (oldGroundNormal.x < 0 and actor:GetVelocity().x > 0)) and currentInput:Up()  and not ( onSteepRightSlope or onSteepLeftSlope ) then
 				actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y - ( math.abs(actor:GetVelocity().y) / maxVelocity.x ) * rampBoost )
 		end
 		if slopeSlow then
@@ -2272,6 +2320,10 @@ function UpdatePrePhysics()
 				angle = math.atan2( groundNormal.x, -groundNormal.y ) / 2--groundNormal.x / math.pi / 2
 			end
 			
+			--if math.abs( groundNormal.x ) < math.abs( groundNormal.y ) then
+				--angle = 0
+			--end
+			
 			if rightNormX ~= leftNormX then
 				local testNormX = (rightNormX + leftNormX) / 2
 				local testAngle = testNormX / math.pi / 2 
@@ -2316,9 +2368,9 @@ function UpdatePrePhysics()
       
 	    if action == dash or action == run then
 			if touchingRightWall and actor:GetVelocity().x >= 0 then
-				actor:SetVelocity( 0, 0 )
+			--	actor:SetVelocity( 0, 0 )
 			elseif touchingLeftWall and actor:GetVelocity().x <= 0 then
-				actor:SetVelocity( 0, 0 )
+			--	actor:SetVelocity( 0, 0 )
 			end
 	    end
 		
@@ -2419,8 +2471,8 @@ function UpdatePostPhysics()
 		--	actor:SetPosition( player:GetSpeedBallPos().x, player:GetSpeedBallPos().y )
 		end
 		
-		local leftState = player:GetTetherState( true )
-		local rightState = player:GetTetherState( false )
+		leftState = player:GetTetherState( true )
+		rightState = player:GetTetherState( false )
 			
 		if leftState == "locked" and rightState == "locked" then
 			player:LockTether( true )
@@ -2463,9 +2515,9 @@ function UpdatePostPhysics()
                 if (touchingRightWall and actor:GetVelocity().x >= 0) or ( touchingLeftWall and actor:GetVelocity().x <= 0 ) then
 					if actor:GetVelocity().y >= -dashSpeed then
                         if actor:IsReversed() then
-							actor:SetPosition( actor:GetPosition().x, minGroundY + playerHeight + .02 )
+						--	actor:SetPosition( actor:GetPosition().x, minGroundY + playerHeight + .02 )
                         else
-						   actor:SetPosition( actor:GetPosition().x, minGroundY - playerHeight - .02 )
+						 --  actor:SetPosition( actor:GetPosition().x, minGroundY - playerHeight - .02 )
                         end
 					end
                 end
@@ -2496,11 +2548,11 @@ function UpdatePostPhysics()
 			else
 				actor:FaceRight()
 			end
-			
+			actor:SetSpriteOffset( 0, .22, 0 )
 			actor:SetSprite( 0, action[frame][1], action[frame][2] )
 		end
 		
-		if actor:GetVelocity().y >= -extraVel and (action == jump or action == doubleJump or ( action == wallJump and frame > 15--[[25--]] ) or action == slopeClimb ) and (onSteepLeftSlope or onSteepRightSlope) and action ~= airDash and action ~= forcedSlide then
+		if actor:GetVelocity().y >= 0 and (action == jump or action == doubleJump or ( action == wallJump and frame > 15--[[25--]] ) or action == slopeClimb ) and (onSteepLeftSlope or onSteepRightSlope) and action ~= airDash and action ~= forcedSlide then
 			SetAction( forcedSlide )
 			frame = 1
 			
@@ -2511,22 +2563,24 @@ function UpdatePostPhysics()
 			end
 			actor:SetSprite( 0, action[frame][1], action[frame][2] )
 		
-		elseif actor:GetVelocity().y < -extraVel and (action == jump or action == doubleJump or ( action == wallJump and frame > 15--[[25--]] ) ) and (onSteepLeftSlope or onSteepRightSlope) and action ~= airDash and action ~= slopeClimb then
+		elseif actor:GetVelocity().y < 0 and (action == jump or action == doubleJump or ( action == wallJump and frame > 15--[[25--]] ) ) and (onSteepLeftSlope or onSteepRightSlope) and action ~= airDash and action ~= slopeClimb then
 				
-				print( "blah slope climb" )
+				--print( "blah slope climb" )
 				SetAction( slopeClimb )
 				
 				frame = 1
 				
 				if onSteepLeftSlope then
 					actor:FaceLeft()
+				--	actor:SetVelocity( actor:GetVelocity().x - 10, actor:GetVelocity().y )
 				elseif onSteepRightSlope then
 					actor:FaceRight()
+				--	actor:SetVelocity( actor:GetVelocity().x + 10 , actor:GetVelocity().y )
 				end
 				
 				
 				actor:SetSprite( 0, action[frame][1], action[frame][2] )
-				print( "blah slope climb 2222" )
+				--print( "blah slope climb 2222" )
 			end
 			
 		--collectgarbage()
