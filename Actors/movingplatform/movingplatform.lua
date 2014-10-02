@@ -57,7 +57,7 @@ function Init()
 		exist[i] = { movingPlatformSet, 0}
 	end
 	
-
+	actor:SetVelocity( distanceX * 60 / framesToSwitch, distanceY * 60 / framesToSwitch )
 	
 	--contact types--
 	bodyTypes = {Normal = 1}
@@ -104,6 +104,11 @@ function Init()
 	stop = false
 	stopCounter = 0
 	stopFrames = 10
+	
+	actor:SetSpriteEnabled( 0, true )
+	actor:SetSpritePriority( 0, -3 )
+	actor:SetSpriteAngle( 0, actor:GetBodyAngle() )
+	actor:SetSprite( 0, action[frame][1], action[frame][2] )
 end
 
 function GetAttackType( i )
@@ -344,6 +349,12 @@ function Message( sender, msg, tag )
 		print( "Set start angle: " .. tag )
 		return 0
 		--print( "setting spinFactor to : " .. spinFactor )
+	elseif msg == "distancex" then
+		distanceX = tag
+		return 0
+	elseif msg == "distancey" then
+		distanceY = tag
+		return 0
 	end
 	return 0
 end
@@ -352,6 +363,8 @@ function Die()
 end
 --before anything
 framesToSwitch = 0
+distanceX = 0
+distanceY = 0
 scaleX = 1
 scaleY = 1
 spinFactor = 0

@@ -96,14 +96,18 @@ function Init()
 		actor:CreateCircle( bodyTypes.Normal, Layer_EnemyHurtbox, 0, 0, maxSize / 2 )
 	end
 	
-	actor:SetSprite( 0, bulletSet, 0 )
+	--actor:SetSprite( 0, bulletSet, 0 )
 	
 	--contact types--
 	
 	
 	--init state
 	
-	
+		actor:SetSpriteEnabled( 0, true )
+	actor:SetSpritePriority( 0, -3 )
+	actor:SetSpriteAngle( 0, actor:GetBodyAngle() )
+	actor:SetSprite( 0, bulletSet, 0 )
+	--actor:SetSprite( 0, action[frame][1], action[frame][2] )
 	
 end
 

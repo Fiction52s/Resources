@@ -92,6 +92,9 @@ function Init()
 
 	
 	actor:SetSpriteEnabled( 0, true )
+	actor:SetSpritePriority( 0, -3 )
+	actor:SetSpriteAngle( 0, actor:GetBodyAngle() )
+	actor:SetSprite( 0, action[frame][1], action[frame][2] )
 	
 	waitToFire = 120
 	framesWaited = 0
@@ -136,7 +139,6 @@ end
 
 function UpdatePrePhysics()	
 
-print( "a" )
 	local aPos = actor:GetPosition()
 	local offsetX = 1
 	aPos.y = aPos.y - 1
@@ -153,12 +155,11 @@ print( "a" )
 		aVel.y = -velY
 	end
 	
-	print( "b" )
+
 	if framesWaited >= waitToFire then
 		stage:CreateActor( "barrel", aPos, aVel, actor:IsFacingRight(), false, 0, actor )
 		framesWaited = 0
 	end
-	print( "c" )
 	
 	--surroundingActors = 0
 	--print( "updating" )

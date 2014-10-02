@@ -94,7 +94,7 @@ function Init()
 		forcedAirCounter = 0
         canInterruptJump = false
         grav = 2
-        airControlSpeed = 4.5--1.5
+        airControlSpeed = 2.25--1.5
         airSlowSpeed = .2
         airMaxControlSpeed = 9
         extraVel = 8 --the velocity you maintain when you let go of jump during your first jump
@@ -771,6 +771,10 @@ function ChooseAction()
 			
         end
 		
+		if grounded and action ~= slide and (leftState == "locked" or rightState == "locked") then
+			SetAction( slide )
+			frame = 1
+		end
 		
 		if action == groundComboAttack1 and frame == gca1CancelFrame and groundComboAttack2Buffered then
 			SetAction( groundComboAttack2 )
@@ -782,8 +786,8 @@ function ChooseAction()
 			frame = 1
 		end
        
-        if not actionChanged and currentInput.X and not prevInput.X and (action == jump or action == doubleJump or ( action == wallJump --[[and frame > 4--]] ) ) and action ~= speedBall then
-				airControlLock = 10 - frame
+        if not actionChanged and currentInput.X and not prevInput.X and (action == jump or action == doubleJump or action == wallJump) then
+				airControlLock = 12 - frame
 				if currentInput:Up() then
 					SetAction( upAirAttack )
 					frame = 1
@@ -1156,6 +1160,7 @@ function HandleAction()
 				
         end
        
+	   --let go of (A) during jump
         if ( action == forwardAirAttack or action == upAirAttack or action == downAirAttack ) and lastAction == jump then
 			if not currentInput.A and prevInput.A and actor:GetVelocity().y < -extraVel and not grounded and canInterruptJump then 
 				actor:SetVelocity( actor:GetVelocity().x, -extraVel )
@@ -1182,15 +1187,7 @@ function HandleAction()
 				if gravityReverseCounter > 0 then
 					actor:SetVelocity( actor:GetVelocity().x, 0 )
 				end
-			else
-				if angle == 0 then
-					if actor:GetVelocity().x > 0 and actor:IsFacingRight() then
-				--		angle = .05
-					elseif actor:GetVelocity().x < 0 and not actor:IsFacingRight() then
-					--	angle = -.05
-					end
-				end
-		
+			else		
 				if not currentInput.A and prevInput.A and actor:GetVelocity().y < -extraVel and not grounded and canInterruptJump then
 						actor:SetVelocity( actor:GetVelocity().x, -extraVel )
 				end
@@ -1510,24 +1507,18 @@ function HandleAction()
 			slopeSlow = false
 	    end
        
-       
-    
         --this allows for slight slowing during an air dash. We can decide later if we like it or not. ( currently removed )
-        if ( action ~= wallJump or ( action == wallJump and frame > 10 )) and not grounded and action ~= airDash and action ~= gravitySlash and action ~= hitstun and action ~= speedBall and action ~= forcedSlide and action ~= slopeClimb then
+        if ( action ~= wallJump or ( action == wallJump and frame > 12 )) and not grounded and action ~= airDash and action ~= gravitySlash and action ~= hitstun and action ~= speedBall and action ~= forcedSlide and action ~= slopeClimb then
 				if airControlLock > 0 then
 					airControlLock = airControlLock - 1
 				else
 					if currentInput:Left() then
 							if actor:GetVelocity().x > -airMaxControlSpeed then
-									--print( "applying impulse" )
-									actor:SetVelocity( math.max( -airMaxControlSpeed, actor:GetVelocity().x - airControlSpeed ), actor:GetVelocity().y  )
-									--actor:ApplyImpulse( math.max( -airControlSpeed, -airMaxControlSpeed - actor:GetVelocity().x ), 0 )
+								actor:SetVelocity( math.max( -airMaxControlSpeed, actor:GetVelocity().x - airControlSpeed ), actor:GetVelocity().y  )
 							end
 					elseif currentInput:Right() then
 							if actor:GetVelocity().x < airMaxControlSpeed then
-							--      print( "applying impulse" )
-									--actor:ApplyImpulse( math.min( airControlSpeed, airMaxControlSpeed - actor:GetVelocity().x ), 0 )
-									actor:SetVelocity( math.min( airMaxControlSpeed, actor:GetVelocity().x + airControlSpeed ), actor:GetVelocity().y  )
+								actor:SetVelocity( math.min( airMaxControlSpeed, actor:GetVelocity().x + airControlSpeed ), actor:GetVelocity().y  )
 							end
 					elseif not ( currentInput:Up() or currentInput:Down() ) then
 							if actor:GetVelocity().x > 0 then
@@ -1571,10 +1562,7 @@ function HandleAction()
 						playerHeight = .75
 						centerOffsetX = 0
 						actor:SetSpriteOffset( 0, 0, -.05 )
-                end
-				
-               
-                
+                end    
         end
 		
 		if action == jump and ((grounded and touchingRightWall and actor:IsFacingRight()) or (grounded and touchingLeftWall and not actor:IsFacingRight())) then
@@ -1585,15 +1573,6 @@ function HandleAction()
 				actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y * 3 / 4 )
         end
 		
-		if (action == run or action == dash or action == slide) and actor:GetVelocity().y < 0 and math.abs( actor:GetVelocity().x ) > groundMaxControlSpeed and ((grounded and touchingRightWall and actor:IsFacingRight()) or (grounded and touchingLeftWall and not actor:IsFacingRight())) then
-                --SetAction( stand )
-                --frame = 1
-				
-				grounded = false
-				--actor:SetVelocity( 0, actor:GetVelocity().y )
-        end
-		
-        --print( "before d: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
         if grounded and action ~= dash and action ~= hitstun then
 				if action ~= slide then				
 					if currentInput:Left() then
@@ -1632,44 +1611,21 @@ function HandleAction()
 				end
                
                 if currentInput:Left() or currentInput:Right() or action == runningAttack then
-                        if actor:GetVelocity().y < 0 and groundNormal.x ~= 0 then
-                                if actor:IsFacingRight() and currentInput:Right() and not prevInput:Right() then
-                                        --actor:SetVelocity( actor:GetVelocity().x - actor:GetVelocity().y, actor:GetVelocity().y )
-                                        --print( "--------------------------------------------------------" )
-                                elseif not actor:IsFacingRight() and currentInput:Left() and not prevInput:Left() then
-                                        --actor:SetVelocity( actor:GetVelocity().x + actor:GetVelocity().y, actor:GetVelocity().y )
-                                end
-                        end
-                       
-                        --print( "before c: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y  )
                         actor:SetVelocity( actor:GetVelocity().x, -actor:GetVelocity().x * groundNormal.x / groundNormal.y )
-                        --print( "c: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
-                        --actor:SetVelocity( actor:GetVelocity().x, -actor:GetVelocity().x * groundNormal.x / groundNormal.y )
-                        --actor:SetVelocity( prevVelocity.x, -prevVelocity.x * groundNormal.x / groundNormal.y )
                 end
-                --print( "d: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
         elseif grounded and action == dash then
-                --print( "before e: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
-                if ( actor:GetVelocity().x > 0 and groundNormal.x < 0 ) or ( actor:GetVelocity().x < 0 and groundNormal.x < 0 ) then
-                        actor:SetVelocity( actor:GetVelocity().x, -actor:GetVelocity().x * groundNormal.x / groundNormal.y )
-                elseif ( actor:GetVelocity().x > 0 and groundNormal.x > 0 ) or ( actor:GetVelocity().x < 0 and groundNormal.x > 0 ) then
-                        actor:SetVelocity( actor:GetVelocity().x, -actor:GetVelocity().x * groundNormal.x / groundNormal.y )
-                else
-                        actor:SetVelocity( actor:GetVelocity().x, 0 )
-                end
-                --print( "e: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+			if ( actor:GetVelocity().x > 0 and groundNormal.x < 0 ) or ( actor:GetVelocity().x < 0 and groundNormal.x < 0 ) then
+					actor:SetVelocity( actor:GetVelocity().x, -actor:GetVelocity().x * groundNormal.x / groundNormal.y )
+			elseif ( actor:GetVelocity().x > 0 and groundNormal.x > 0 ) or ( actor:GetVelocity().x < 0 and groundNormal.x > 0 ) then
+					actor:SetVelocity( actor:GetVelocity().x, -actor:GetVelocity().x * groundNormal.x / groundNormal.y )
+			else
+					actor:SetVelocity( actor:GetVelocity().x, 0 )
+			end
         end
         
 		if action == runningAttack then
 			actor:SetSpriteOffset( 0, 1, 0 )
-			if actor:IsFacingRight() then
-				--actor:SetSpriteOffset( 0, 1, 1 )
-			else
-				--actor:SetSpriteOffset( 0, -1, -1 )
-			end
-			--if frame >=4 and frame <= 5 then
 			Sword( .5,0, 1, 1.5 )
-			
 		end
 		
 		if action == run or action == standToRun then
@@ -1680,58 +1636,32 @@ function HandleAction()
         local a = angle
         local c = math.cos( a )
         local s = math.sin( a )
-        --jump action will eventually mean ascending only, not the fall
-        --+why do i need gravity while standing?
-        --if ( not grounded ) and action ~= airDash then--or action == stand then
-		
-		if action == speedBall then
-			--grav = .5
-		end
 		
 		if not grounded and ((leftState == "locked" or rightState == "locked") and currentInput.B) then
 			actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y - grav )
 			print( "WTF HEREEE!!!!!" )
 		end
 		
-        if action ~= airDash then--and action ~= speedBall then
-        --if not grounded and action ~= airDash then
-                if ( action == stand or action == dashToStand ) and trueGrounded then	
-				--	actor:SetVelocity( actor:GetVelocity().x - groundNormal.x * grav, actor:GetVelocity().y - groundNormal.y *  grav )
-                elseif not trueGrounded then		
-					--actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y + grav )
-                end
-				
-				if not grounded then
-					actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y + grav )
-				elseif actor:GetVelocity().x == 0 then
-					actor:SetVelocity( actor:GetVelocity().x - groundNormal.x * .001, actor:GetVelocity().y - groundNormal.y * .001 )
-					
-					--print( "testing" )
-				end
-				
-				
-                --actor:ApplyImpulse( 0, grav )
+        if action ~= airDash then--and action ~= speedBall then			
+			if not grounded then
+				actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y + grav )
+			elseif actor:GetVelocity().x == 0 then
+				actor:SetVelocity( actor:GetVelocity().x - groundNormal.x * .001, actor:GetVelocity().y - groundNormal.y * .001 )
+			end
         end
 		slopeAccel = false
         if currentInput:Down() and grounded and actor:GetVelocity().y > 0 and (action == run or action == standToRun or action == dash) then
-		
 			if action == dash or (currentInput:Left() or currentInput:Right() ) then
-                --print( "down" )
 				--accel = .8 * ( maxVelocity.x / math.abs( actor:GetVelocity().x ) ) * .25
 				--accel = ( 1 - math.abs( actor:GetVelocity().x / maxVelocity.x ) ) * 1 + .6
 				accel = .8
 				--accel =  * ( maxVelocity.x / math.abs( actor:GetVelocity().x ) ) * 1
 				accel = math.min( accel, .97 )
 				accel = math.max( accel, .3 )
-				--print( "accel: " .. accel )
+				
 				slopeAccel = true
                 actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y + accel * math.abs( groundNormal.x / groundNormal.y ) )
-				--print( "setvel: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
-				--print( "accel: " .. accel )
               end
-
-			   --actor:ApplyImpulse( 0, 1 * math.abs( groundNormal.x / groundNormal.y ) )
-				--print( "here: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
         end    
        
         --dashing up a slope, etc
@@ -2190,29 +2120,23 @@ function UpdatePrePhysics()
 			hasAirDash = true
 			hasGravitySlash = true
 		end
-		--print( "rccount: " .. rcCount )
-		--print( "groundnormal: " .. groundNormal.x .. ", " .. groundNormal.y )
 		
         if trueGrounded then
                 grounded = true
-				
         end
 		
 		if groundNormal.y >= -.5 then
-			grounded = false
-			
+			grounded = false		
 		end
 		
         if lastGrounded and rcCount > 0 and ( action == stand or action == dashToStand or action == run or action == standToRun or action == dash or action == dashAttack or action == groundComboAttack1 or action == groundComboAttack2 or action == groundComboAttack3 or action == upGroundAttack or action == downGroundAttack or action == runningAttack or action == nil ) then
-				if groundNormal.y < -.5 then
+			if groundNormal.y < -.5 then
 				grounded = true
-				else
+			else
 				grounded = false
-				
-				end
+			end
         elseif not trueGrounded and ( rcCount == 0 or (rcCount == 1 and actor:GetVelocity().y < 0) ) then
-                grounded = false
-				
+			grounded = false				
         end
 		
 		rampSlopeAdjust = false
@@ -2230,11 +2154,8 @@ function UpdatePrePhysics()
 			--print( "here" )
 			end
 		end
-		
 
-	
 		--hold up to hold your momentum off of a cliff
-		
 		if ((oldGroundNormal.x > 0 and groundNormal.x <= 0 and actor:GetVelocity().x < 0) 
 			or (oldGroundNormal.x < 0 and groundNormal.x >= 0 and actor:GetVelocity().x > 0)) and currentInput:Up() and not ( onSteepRightSlope or onSteepLeftSlope ) then
 			grounded = false
@@ -2245,6 +2166,7 @@ function UpdatePrePhysics()
 			or (oldGroundNormal.x < 0 and actor:GetVelocity().x > 0)) and currentInput:Up()  and not ( onSteepRightSlope or onSteepLeftSlope ) then
 				actor:SetVelocity( actor:GetVelocity().x, actor:GetVelocity().y - ( math.abs(actor:GetVelocity().y) / maxVelocity.x ) * rampBoost )
 		end
+		
 		if slopeSlow then
 			grounded = false
 			
@@ -2283,9 +2205,7 @@ function UpdatePrePhysics()
         end
 		
 
-		--if action == speedBall then
-		--	grounded = false
-		--end
+		
 
 		
 		

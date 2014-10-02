@@ -82,6 +82,9 @@ function Init()
 	bulletActorGroup = stage:CreateActorGroup( "basicturretbullet", bulletArraySize, pos, vel, actor:IsFacingRight(), false, spriteAngle, actor )
 	bulletActorGroup:Message( actor, "setmaxsize", maxBulletSize )
 
+		bulletActorGroup:SetIndex( 4 )
+	bulletActorGroup:SetPause( false )
+	
 	for i = 0, bulletArraySize - 1 do
 		bulletActorGroup:SetIndex( i )
 		--bulletActorGroup:SetSpriteEnabled( 0, true )
@@ -110,6 +113,12 @@ function Init()
 	
 	--actor:CreateCircle( hitboxTypes.Slash, Layer_PlayerHitbox, 0, 0, .5, )
 	actor:SetBodyAngle( angle )
+	
+	actor:SetSpriteEnabled( 0, true )
+	actor:SetSpritePriority( 0, -3 )
+	actor:SetSpriteAngle( 0, actor:GetBodyAngle() )
+	actor:SetSprite( 0, action[frame][1], action[frame][2] )
+	
 	print( "-----------------------" )
 
 end
