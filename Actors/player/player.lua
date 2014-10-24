@@ -687,16 +687,17 @@ function ChooseAction()
 				player:LockTether( true )
 			end
 			
+			local shrinkNum = .1
 			if rightState == "locked" and currentInput.rightTrigger > triggerThresh then
 
 				--player:LockTether( false )
 				
 				if leftState == "locked" and currentInput.leftTrigger > triggerThresh then
-					player:ShrinkTether( .25, false )
-					player:ShrinkTether( .25, true )
+					player:ShrinkTether( shrinkNum, false )
+					player:ShrinkTether( shrinkNum, true )
 					--player:GrowTether( 1, true )
 				else
-					player:ShrinkTether( 1, false )
+					player:ShrinkTether( shrinkNum* 4, false )
 				end
 					
 			end
@@ -705,11 +706,11 @@ function ChooseAction()
 				--player:LockTether( true )
 				
 				if currentInput.rightTrigger > triggerThresh and rightState == "locked" then
-					player:ShrinkTether( .25, true )
-					player:ShrinkTether( .25, false )
+					player:ShrinkTether( shrinkNum, true )
+					player:ShrinkTether( shrinkNum, false )
 				--	player:GrowTether( 1, false )
 				else
-					player:ShrinkTether( 1, true )
+					player:ShrinkTether( shrinkNum * 4, true )
 				end
 				
 			end
@@ -1918,8 +1919,16 @@ end
 	carryVel.y = 0
 	player:SetCarryVelocity( 0, 0 )
 	actor.health = maxHealth
-	--actor:SetPosition( originalPos.x, originalPos.y )
+	actor:SetPosition( originalPos.x, originalPos.y )
 	grounded = false
+	lastGrounded = false
+	trueGrounded = false
+	
+	SetAction( jump )
+	frame = 3
+	
+	prevVelocity.x = actor:GetVelocity().x
+	prevVelocity.y = actor:GetVelocity().y
 	print( "spawn" )
 	--stage:SetCameraPosition( actor:GetPosition().x, actor:GetPosition().y )
 	--stage:SetCameraZoom( 1 )
@@ -2225,9 +2234,9 @@ function UpdatePrePhysics()
 		carryVel.x = 0
 		carryVel.y = 0
 		
-       
+     
         ChooseAction()
- 		
+ 	
         if framesInAir > 5 then--or ( rcCount == 1 and groundNormal.x ~= 0 ) then
 			angle = 0
         elseif rcCount > 0 and grounded then
@@ -2285,7 +2294,7 @@ function UpdatePrePhysics()
        
        
         HandleAction()
-      
+     
 	    if action == dash or action == run then
 			if touchingRightWall and actor:GetVelocity().x >= 0 then
 			--	actor:SetVelocity( 0, 0 )
@@ -2369,7 +2378,7 @@ function UpdatePrePhysics()
 		
 
 	   
-   ---   print( "vel1: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
+      print( "vel1: " .. actor:GetVelocity().x .. ", " .. actor:GetVelocity().y )
        
         prevPosition.x = actor:GetPosition().x
         prevPosition.y = actor:GetPosition().y
@@ -2672,6 +2681,8 @@ function HandleActorCollision( otherActor, hurtboxTag, pointCount, point1, point
 end
  
 function HandleStageCollision( pointCount, point1, point2, normal, enabled )	
+	
+		
 		if enabled and action == speedBall then
 		
 			--actor:SetFriction( .2 )
@@ -2707,6 +2718,10 @@ function HandleStageCollision( pointCount, point1, point2, normal, enabled )
 		else
 			actor:SetRestitution( 0 )
 		end
+		
+		
+		--if enabled and ( rightState == "anchored" or leftState == "anchored" ) then
+		--	actor:SetFriction( 0 )
 		
         if normal.y < -.5 and enabled and action ~= speedBall then
 			if not lastGrounded and currentInput:Down() and not ( currentInput:Right() or currentInput:Left() ) and normal.y > -1 then
@@ -2794,6 +2809,9 @@ function Message( sender, msg, tag )
 	if msg == "spikekill" then
 		killed = true
 		--die, respawn should probably be part of the c++ code
+	elseif msg == "checkpoint" then
+		originalPos.x = sender:GetPosition().x
+		originalPos.y = sender:GetPosition().y
 	elseif msg == "willdropthrough" then
 		if currentInput:Down() then
 			if not grounded or currentInput.A then
